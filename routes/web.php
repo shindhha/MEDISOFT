@@ -13,8 +13,20 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
 
-Route::get('/D',[\App\Http\Controllers\PostConnection::class,'index']);
+Route::match(['get','post'],'/',[\App\Http\Controllers\PostConnection::class,'index']);
+
+Route::match(['get','post'],'/cabinet',[\App\Http\Controllers\PostAdministrateur::class,'index']);
+Route::put('/cabinet',[\App\Http\Controllers\PostAdministrateur::class,'updateOrCreateCabinet']);
+Route::match(['get','post'],'/listMedecin',[\App\Http\Controllers\PostAdministrateur::class,'goListMedecins']);
+Route::match(['get','post'],'/erreursimport',[\App\Http\Controllers\PostAdministrateur::class,'goErreursImport']);
+
+
+Route::prefix('/editDoctor')->group( function () {
+
+    Route::match(['get','post'],'/{action}', [\App\Http\Controllers\PostAdministrateur::class,'goEditDoctor'])->name('add');
+    Route::put('/{action}', [\App\Http\Controllers\PostAdministrateur::class,'validForm']);
+}     
+);
+
+Route::any('/ficheMedecin/{id}',[\App\Http\Controllers\PostAdministrateur::class,'goDoctorSheet']);
