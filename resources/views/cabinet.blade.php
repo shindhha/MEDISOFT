@@ -25,9 +25,9 @@
                                 <label for="adresse">Adresse : </label>
                                 <input class="form-control" type="text" name="adresse" value="{{$cabinet->adresse}}">
                                 <label for="codePostal">Code postal : </label>
-                                <input class="form-control" type="number" name="codePostal" min="1001" max="98800" value="{{$cabinet['codePostal']}}">
+                                <input class="form-control" type="number" name="codePostal" min="1001" max="98800" value="{{$cabinet->codePostal}}">
                                 <label for="ville">Ville : </label>
-                                <input class="form-control" type="text" name="ville" value="{{$cabinet['ville']">
+                                <input class="form-control" type="text" name="ville" value="{{$cabinet->ville}}">
 								<input type="hidden" name="controller" value="administrateur">
 								<input type="hidden" name="action" value="insertCabinet">
                                 <div class="text-center mt-2">

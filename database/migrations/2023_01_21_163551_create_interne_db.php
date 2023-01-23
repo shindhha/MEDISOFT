@@ -105,7 +105,12 @@ return new class extends Migration
              'activite' => 'Généraliste',
              'dateDebutActivites' => date('Y-m-d'),
              'dateInscription' => date('Y-m-d')   
-             ]);   
+             ]);
+        DB::table('cabinet')->insert([
+            'adresse' => 'Saint jean d\'alcapies',
+            'codePostal' => 12250,
+            'ville' => 'Saint affrique'
+        ]);
     }
 
     /**

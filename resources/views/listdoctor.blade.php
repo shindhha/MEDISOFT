@@ -40,13 +40,13 @@
                                             </span>
                                             <div class="p-0  dropdown-menu dropdown-menu-end green text-white no-border" aria-labelledby="dropdownMenuButton1">
                                                 <table class="text-white ">
-                                                    <form action="/ficheMedecin/{{$medecin->idMedecin}}" method="POST" class="d-flex flex-column green">
+                                                    <form action="{{route('show',['id' => $medecin->idMedecin])}}" method="POST" class="d-flex flex-column green">
+                                                        
                                                         @csrf
+                                                        <input type="hidden" name="idMedecin" value="{{$medecin->idMedecin}}">
                                                         <tr><td><input type="submit" value="Afficher"> </td></tr>
                                                     </form>
-                                                    <form action="index.php" action="POST" class="d-flex flex-column green">
-                                                        <input type="hidden" name="controller" value="administrateur">
-                                                        <input type="hidden" name="action" value="deleteMedecin">
+                                                    <form action="" action="POST" class="d-flex flex-column green">
                                                         <input type="hidden" name="idMedecin" value="{{$medecin->idMedecin}}">
                                                         <input type="hidden" name="idUser" value="
                                                         {{$medecin->idUser}}">
@@ -69,7 +69,7 @@
             </div>
             <div class="d-flex flex-row justify-content-between float-end">
                 <div class="d-flex me-2 py-2 px-3 border-1 green">
-                    <form action="editDoctor/addMedecin" method="post">
+                    <form action="{{route('add')}}" method="post">
                         @csrf
                         
                         <input type="submit" class="green no-border text-white" value="Ajouter un médecin">

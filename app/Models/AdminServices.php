@@ -31,23 +31,18 @@ class AdminServices extends Model
     }
 
     public function getInformationCabinet() {
-        return DB::table("cabinet")->first();
+        return DB::table("cabinet")->where('id',1)->first();
     }
 
     public function deleteUser($userID)
     {
-        $sql = "DELETE FROM users where id = :userID";
-        $stmt = $pdo->prepare($sql);
-        $stmt->bindParam("userID",$userID);
-        $stmt->execute();
+        BD::table('users')->where('id',$userID)->delete();
     }
 
     public function deleteMedecin($idMedecin)
     {
+        DB::table('medecins')->where('idMedecin',$idMedecin)->delete();
         $sql = "DELETE FROM medecins WHERE idMedecin = :idMedecin";
-        $stmt = $pdo->prepare($sql);
-        $stmt->bindParam("idMedecin",$idMedecin);
-        $stmt->execute();
     }
     public function updateUser($idUser,$login,$password)
     {

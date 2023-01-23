@@ -6,11 +6,13 @@ use Illuminate\Http\Request;
 use App\Models\AdminServices;
 use Illuminate\Support\Facades\DB;
 use App\Models\settings;
+use App\Models\medecin;
 use PDOException;
 class PostAdministrateur extends Controller
 {
     private $importservice;
     private $adminServices;
+    public $lastDoctor;
     private $files = [["CIS_bdpm.txt","BDPM",12,false,0,"CIS_BDPM"],
                       ["CIS_CIP_bdpm.txt","CIP",13,false,4,"CIS_CIP_BDPM","codeCIP13"],
                       ["CIS_COMPO_bdpm.txt","COMPO",8,true,0,"CIS_COMPO"],
@@ -20,7 +22,6 @@ class PostAdministrateur extends Controller
                       ["CIS_GENER_bdpm.txt","GENER",5,true,2,"CIS_GENER"],
                       ["CIS_CPD_bdpm.txt","CPD",2,false,0,"CIS_CPD"],
                       ["CIS_InfoImportantes.txt","INFO",4,false,0,"CIS_INFO"]];
-
    
     function __construct()
     {
@@ -66,21 +67,21 @@ class PostAdministrateur extends Controller
         return $view;
     }
 
-    public function deleteMedecin($pdo)
+    public function deleteMedecin()
     {
         $idUser = $request->idUser;
         $idMedecin = $request->idMedecin;
 
         try {
-            $pdo->beginTransaction();
-            $this->adminServices->deleteMedecin($pdo,$idMedecin);
-            $this->adminServices->deleteUser($pdo,$idUser);
-            $pdo->commit();
+            DB::beginTransaction();
+            $this->adminServices->deleteMedecin($idMedecin);
+            $this->adminServices->deleteUser($idUser);
+            DB::commit();
         } catch (PDOException $e) {
-            $pdo->rollback();
+            DB::rollback();
         }
         
-        return $this->goListMedecins($pdo);
+        return $this->goListMedecins();
     }
 
     public function goListMedecins() {
@@ -94,40 +95,28 @@ class PostAdministrateur extends Controller
         return view('listdoctor',['medecins' => $medecins, "pageInfos" => $pageSettings->getSettings()]);
     }
 
-    public function goEditDoctor(Request $request,$action)
+    public function goEditDoctor($id = null,Request $request = null)
     {
         $medecin = [];
-        if ($action == "addMedecin") {
-            $medecin['numRPPS'] = $request->numRPPS;
-            $medecin['nom'] = $request->nom;
-            $medecin['prenom'] = $request->prenom;
-            $medecin['adresse'] = $request->adresse;
-            $medecin['numTel'] = $request->numTel;
-            $medecin['email'] = $request->email;
-            $medecin['dateDebutActivites'] = $request->dateDebutActivite;
-            $medecin['activite'] = $request->activite;
-            $medecin['codePostal'] = $request->codePostal;
-            $medecin['ville'] = $request->ville;
-            $medecin['lieuAct'] = $request->lieuAct;
+        if ($id === null) {
+            $medecin = new medecin($request);
         } else {
-            $numRPPS = $request->numRPPS;
-            $medecin = $this->adminServices->getMedecin($pdo,$_SESSION['idMedecin']); 
+            $medecin = $this->adminServices->getMedecin($id);
         }
         $pageSettings = new settings();
         $pageSettings->setTitle('Edition Medecin');
         $pageSettings->addIconToSideBar('/cabinet','article');
         $pageSettings->addIconToSideBar('/listMedecin','groups');
         $pageSettings->addIconToSideBar('/erreursimport','settings');
-        return view('editDoctor',['medecin' => $medecin , 'pageInfos' => $pageSettings->getSettings(),'action' => $action]);
+        return view('editDoctor',['medecin' => $medecin , 
+                                  'pageInfos' => $pageSettings->getSettings(), 
+                                  'id' => $this->lastDoctor]);
     }
 
-    public function goDoctorSheet(Request $request,$id)
+    public function goDoctorSheet($id)
     {
-        
 
-        if ($request->idMedecin !== null) {
-            $_SESSION['idMedecin'] = $request->idMedecin;
-        }
+        $this->lastDoctor = $id;
         $medecin = $this->adminServices->getMedecin($id);
         $_SESSION['idUserMedecin'] = $medecin->idUser;
         $pageSettings = new settings();
@@ -135,7 +124,7 @@ class PostAdministrateur extends Controller
         $pageSettings->addIconToSideBar('/cabinet','article');
         $pageSettings->addIconToSideBar('/listMedecin','groups');
         $pageSettings->addIconToSideBar('/erreursimport','settings');
-        return view('DoctorSheet',['medecin' => $medecin,'pageInfos' => $pageSettings->getSettings()]);
+        return view('DoctorSheet',['id' => $this->lastDoctor,'medecin' => $medecin,'pageInfos' => $pageSettings->getSettings()]);
     }
 
     public function goErreursImport()
@@ -161,7 +150,7 @@ class PostAdministrateur extends Controller
     public function updateMedecin($request) {
         try {
             DB::beginTransaction();
-            $this->adminServices->updateMedecin($_SESSION['idMedecin'],
+            $this->adminServices->updateMedecin($this->lastDoctor,
                 $request->numRPPS ,
                 $request->nom,
                 $request->prenom,
@@ -175,7 +164,7 @@ class PostAdministrateur extends Controller
             );
             $this->adminServices->updateUser($pdo,$_SESSION['idUserMedecin'],$request->numRPPS,$request->password);
             DB::commit();
-            return $this->goDoctorSheet();
+            return $this->goDoctorSheet($this->lastDoctor);
         } catch (PDOException $e) {
             DB::rollback();
             $Errors = [];
@@ -221,10 +210,10 @@ class PostAdministrateur extends Controller
                 $request->dateDebutActivite
             );
             DB::commit();
-            $_SESSION['idMedecin'] = $idMedecin;
+            $this->lastDoctor = $idMedecin;
             $_SESSION['idUserMedecin'] = $idUserMedecin;
             
-            return $this->goDoctorSheet($request,$idMedecin);
+            return $this->goDoctorSheet(new medecin($request),$idMedecin);
         } catch (PDOException $e) {
             DB::rollback();
             $Errors = [];
@@ -240,7 +229,7 @@ class PostAdministrateur extends Controller
             if ($e->getCode() == "2") {
                 $Errors['date'] = ($e->getMessage());
             }
-            return redirect()->route('add',['action' => 'ds']);
+            return redirect()->route('add');
         }
         return view('editDoctor');
 

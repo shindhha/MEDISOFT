@@ -13,7 +13,6 @@
             @include('includes/navbar')
             @csrf
             <!-- Bandeau Patient -->
-
                 <div class="blue row">
                     <div class="d-flex justify-content-between">
                         <span></span>
@@ -80,13 +79,13 @@
                         </div>
                     </div>
                     <div class="col-md-12 text-center text-md-end px-4 pt-3">
-                    <form action="/editDoctor/updateMedecin" method="post">
+                    <form action="{{route('update',['id' => $id])}}" method="post">
                         @csrf
-                        
-                        <input type="submit" class="green no-border text-white" value="Ajouter un médecin">
+                        <input type="submit" class="green no-border text-white" value="Modifier le médecin">
                     </form>
                         
                     </div>
+                    <?php dd($id); ?>
             </div>
         </div>
     </div>
