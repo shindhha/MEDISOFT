@@ -8,7 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 class medecin extends Model
 {
     use HasFactory;
-    public $id = 2;
+    public $idMedecin = "";
+    public $idPatient = "";
     public $nom = "";
     public $prenom = "";
     public $numRPPS = "";
@@ -20,7 +21,11 @@ class medecin extends Model
     public $codePostal = "";
     public $ville = "";
     public $lieuAct = "";
-
+    public $medecinTraitant = "";
+    public $dateNaissance = "";
+    public $LieuNaissance = "";
+    public $notes = "";
+    public $sexe = -1;
     function __construct($array)
     {
 

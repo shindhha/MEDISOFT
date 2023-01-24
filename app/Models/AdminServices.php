@@ -36,7 +36,7 @@ class AdminServices extends Model
 
     public function deleteUser($userID)
     {
-        BD::table('users')->where('id',$userID)->delete();
+        DB::table('users')->where('id',$userID)->delete();
     }
 
     public function deleteMedecin($idMedecin)
@@ -47,7 +47,7 @@ class AdminServices extends Model
     public function updateUser($idUser,$login,$password)
     {
         DB::table('users')->where('id',$idUser)
-                          ->update(['login' => $login,'password' => $password]);
+                          ->update(['login' => $login,'password' => md5($password)]);
     }
     /**
      * Inserer un nouvel utilisateur dans la base de données
@@ -63,7 +63,7 @@ class AdminServices extends Model
     public function addUser($login,$password)
     {
         return DB::table('users')->insertGetId(
-            ['login' => $login, 'password' => $password]
+            ['login' => $login, 'password' => md5($password)]
         );
     }
 

@@ -3,31 +3,37 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\UsersServices;
+use App\Models\settings;
+use App\Models\medecin;
 
 class PostMedecin extends Controller
 {
     private $usersservices;
+
     public function __construct()
     {
         $this->usersservices = UsersServices::getDefaultUsersService();
     }
-    public function index($pdo) {
-        $view = new View("Sae3.3CabinetMedical/views/patientslist");
-        HttpHelper::getParam('controller') ?: 'Connection';
+    public function getConfig1($name)
+    {
+        $pageSettings = new settings();
+        $pageSettings->setTitle($name);
+        $pageSettings->addIconToSideBar('/cabinet','article');
+        $pageSettings->addIconToSideBar('/listMedecin','groups');
+        return $pageSettings;
+    }
+    public function index(Request $request) {
 
-        $textInput = HttpHelper::getParam("search")? explode(" ", HttpHelper::getParam("search")) : "%"; 
+        $textInput = $request->search? explode(" ", $request->search) : "%"; 
         $nom = $textInput[0]?: "";
         $prenom = isset($textInput[1]) == true ? $textInput[1] : $textInput[0];
-        $medecinTraitant = HttpHelper::getParam("medecin")?: "%";
+        $medecinTraitant = $request->medecin?: "%";
 
-        $patients = $this->usersservices->getListPatients($pdo,$medecinTraitant,$nom."%",$prenom."%");
-        $medecin = $this->usersservices->getMedecins($pdo);
-        $view->setVar("medecin",$medecin);
-        $view->setVar("patients",$patients);
-        if (!isset($_SESSION['currentMedecin'])) {
-            $view = new View("Sae3.3CabinetMedical/views/connection");
-        }
-        return $view;
+        $pageSettings = $this->getConfig1('Liste Patients');
+        $patients = $this->usersservices->getListPatients($medecinTraitant,$nom."%",$prenom."%");
+        $medecin = $this->usersservices->getMedecins();
+        return view('listPatient',['medecins' => $medecin,'patients' => $patients, 'pageInfos' => $pageSettings->getSettings()]);
     }
 
     public function deletePatient($pdo)
@@ -165,40 +171,20 @@ class PostMedecin extends Controller
         return $this->goFichePatient($pdo);
     }
 
-    public function goEditPatient($pdo,$action = "")
+    public function goEditPatient($id = null,Request $request = null)
     {
-        $view = new View("Sae3.3CabinetMedical/views/editPatient");
-
-        $nextAction = HttpHelper::getParam("nextAction")?: $action;
-        if ($nextAction == "addPatient") {
-            $patient['numSecu'] = HttpHelper::getParam("numSecu");
-            $patient['LieuNaissance'] = HttpHelper::getParam("LieuNaissance");
-            $patient['nom'] = HttpHelper::getParam("nom");
-            $patient['prenom'] = HttpHelper::getParam("prenom");
-            $patient['dateNaissance'] = HttpHelper::getParam("dateNaissance");
-            $patient['adresse'] = HttpHelper::getParam("adresse");
-            $patient['codePostal'] = HttpHelper::getParam("codePostal");
-            $patient['ville'] = HttpHelper::getParam("ville");
-            $patient['medecinRef'] = HttpHelper::getParam("medecinRef");
-            $patient['numTel'] = HttpHelper::getParam("numTel");
-            $patient['email'] = HttpHelper::getParam("email");
-            $patient['sexe'] = HttpHelper::getParam("sexe");
-            $patient['notes'] = HttpHelper::getParam("notes");
+        $patient;
+        if ($id === null) {
+            $patient = new medecin($request);
         } else {
-            $patient = $this->usersservices->getPatient($pdo,$_SESSION['idPatient']);
+            $patient = $this->usersservices->getPatient($id);
         }
         
-        $nextAction = HttpHelper::getParam('nextAction')?: $action;
-        $medecins = $this->usersservices->getMedecins($pdo);
-        
-        $view->setVar("patient",$patient);
-        
-        $view->setVar("medecins",$medecins);      
-        $view->setVar("action",$nextAction);
-        if (!isset($_SESSION['currentMedecin'])) {
-            $view = new View("Sae3.3CabinetMedical/views/connection");
-        }
-        return $view;
+        $medecins = $this->usersservices->getMedecins();
+        $pageSettings = $this->getConfig1('Fiche Patient');
+        return view('editPatient',['patient' => $patient,
+                                  'medecins' => $medecins , 
+                                  'pageInfos' => $pageSettings->getSettings()]);
     }
 
     public function goFicheVisite($pdo)

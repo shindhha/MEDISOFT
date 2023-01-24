@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\UsersServices;
 use App\Http\Controllers\PostAdministrateur;
+use App\Http\Controllers\PostMedecin;
 use App\Models\settings;
 class PostConnection extends Controller
 {
@@ -19,9 +20,9 @@ class PostConnection extends Controller
 
         if ($nbUsers) {
             if ($request->login == "admin") {
-                return redirect()->action([PostAdministrateur::class, 'index']);
+                return to_route('administrateur');
             } else {
-                return view('listPatient');
+                return to_route('medecin');
             }
         }
 

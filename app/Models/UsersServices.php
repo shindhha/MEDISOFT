@@ -104,12 +104,9 @@ class UsersServices extends Model
    * @param pdo La connexion a la base de données
    * @return La liste des medecins de la base de données
    */
-  public function getMedecins($pdo)
+  public function getMedecins()
   {
-	$sql = "SELECT * 
-	FROM Medecins";
-
-	return $pdo->query($sql);
+  	return DB::table('medecins')->get();
   }
   /**
    * Supprime le medicament avec l'identifiant 'codeCIS' 
@@ -341,20 +338,9 @@ class UsersServices extends Model
    *         Notes relatives au patient
    * 
    */
-  public function getPatient($pdo,$idPatient)
+  public function getPatient($idPatient)
   {
-	$sql = "SELECT Patients.numSecu,LieuNaissance,nom,prenom,dateNaissance,adresse,codePostal,medecinRef,numTel,email,sexe,notes
-	FROM Patients
-	WHERE Patients.idPatient LIKE :idPatient";
-
-	$stmt = $pdo->prepare($sql);
-	$stmt->bindParam('idPatient',$idPatient);
-
-
-	$stmt->execute();
-
-	return $stmt->fetch();
-
+  	return DB::table('patients')->where('idPatient',$idPatient)->first();
   }
 
   public function getMedicament($pdo,$codeCIP)
@@ -512,25 +498,14 @@ class UsersServices extends Model
    *         Leurs numéro de téléphone
    *         Leurs adresse 
    */  
-	public function getListPatients($pdo,$medecinTraitant,$nom,$prenom)
+	public function getListPatients($medecinTraitant,$nom,$prenom)
 	{
-		$sql = "SELECT idPatient, Patients.numSecu,LieuNaissance,nom,prenom,dateNaissance,adresse,codePostal,medecinRef,numTel,email,sexe,notes
-		FROM Patients
-		WHERE ((nom LIKE :search1 OR prenom LIKE :search2)
-			OR (nom LIKE :search3 OR prenom LIKE :search4))
-		AND medecinRef LIKE :medecinTraitant";
 
-		$stmt = $pdo->prepare($sql);
-		$stmt->bindParam('search1',$nom);
-		$stmt->bindParam('search2',$prenom); 
-		$stmt->bindParam('search3',$prenom);
-		$stmt->bindParam('search4',$nom); 
-		$stmt->bindParam('medecinTraitant',$medecinTraitant);
+		return DB::table('patients')->where('nom','like',$nom)
+		                     ->where('prenom','like',$prenom)
+		                     ->where('medecinTraitant','like',$medecinTraitant)
+		                     ->get();
 
-
-		$stmt->execute();
-
-		return $stmt->fetchAll();
 
 	}
 	public function getListMedic($pdo,$formePharma = "%",$labelVoieAdministration = "%",$etatCommercialisation = -1,$tauxRemboursement = "",$prixMin = 0,$prixMax = 100000,$surveillanceRenforcee = -1,$valeurASMR = "%",$libelleNiveauSMR = "%", $designation = "%")

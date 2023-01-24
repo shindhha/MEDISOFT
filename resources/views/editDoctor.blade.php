@@ -5,7 +5,7 @@
     <div class="container-fluid h-100  text-white">
         <div class="row h-100">
             <!-- Menu -->
-            <?php dd($pageInfos); ?>
+            
             @include('includes/sideBar')
             <!-- Main page -->  
             <div class="col-md-11 h-100 text-center">
@@ -14,7 +14,7 @@
 
                 
                 <!-- Bandeau Patient -->
-                <form method="post" action="/editDoctor/{{$id}}" class="h-75 overflow-scroll w-100">
+                <form method="post" action="/editDoctor/{{$medecin->idMedecin?:''}}" class="h-75 overflow-scroll w-100">
                     @method('PUT')
                     @csrf
                     

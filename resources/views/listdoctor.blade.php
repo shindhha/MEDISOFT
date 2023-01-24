@@ -27,8 +27,9 @@
                                         <th>Téléphone</th>
                                         <th></th>
                                     </tr>
-                                    <tr>
+                                    
                                     @foreach($medecins as $medecin)
+                                    <tr>
                                         <td>{{ $medecin->nom}}</td>
                                         <td>{{$medecin->prenom}}</td>
                                         <td>{{$medecin->dateDebutActivites}}</td>
@@ -46,19 +47,20 @@
                                                         <input type="hidden" name="idMedecin" value="{{$medecin->idMedecin}}">
                                                         <tr><td><input type="submit" value="Afficher"> </td></tr>
                                                     </form>
-                                                    <form action="" action="POST" class="d-flex flex-column green">
+                                                    <form action="{{route('deleteDoctor')}}" method="POST" class="d-flex flex-column green">
+                                                        
+                                                        @csrf
                                                         <input type="hidden" name="idMedecin" value="{{$medecin->idMedecin}}">
-                                                        <input type="hidden" name="idUser" value="
-                                                        {{$medecin->idUser}}">
-
-                                                        <tr><td><input type="submit"  value="Supprimer"> </td></tr>
+                                                        <input type="hidden" name="idUser" value="{{$medecin->idUser}}">
+                                                        <tr><td><input type="submit" value="Supprimer"> </td></tr>
                                                     </form>
                                                 </table>            
                                             </div>
                                         </div>
                                         </td>
+                                        </tr>
                                     @endforeach
-                                    <tr>
+                                    
                                 </table>
                             </div>
                         </div>

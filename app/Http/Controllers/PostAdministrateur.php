@@ -71,21 +71,21 @@ class PostAdministrateur extends Controller
         return $view;
     }
 
-    public function deleteMedecin()
+    public function deleteMedecin(Request $request)
     {
-        $idUser = $request->idUser;
-        $idMedecin = $request->idMedecin;
 
         try {
             DB::beginTransaction();
-            $this->adminServices->deleteMedecin($idMedecin);
-            $this->adminServices->deleteUser($idUser);
+            $this->adminServices->deleteMedecin($request->idMedecin);
+            $this->adminServices->deleteUser($request->idUser);
             DB::commit();
         } catch (PDOException $e) {
+            throw new Exception("Error Processing Request", 1);
+            
             DB::rollback();
         }
         
-        return $this->goListMedecins();
+        return to_route('doctorList');
     }
 
     public function goListMedecins() {
@@ -97,7 +97,7 @@ class PostAdministrateur extends Controller
 
     public function goEditDoctor($id = null,Request $request = null)
     {
-        $medecin = [];
+        $medecin;
         if ($id === null) {
             $medecin = new medecin($request);
         } else {
@@ -105,8 +105,7 @@ class PostAdministrateur extends Controller
         }
         $pageSettings = $this->getConfig1('Edition Medecin');
         return view('editDoctor',['medecin' => $medecin , 
-                                  'pageInfos' => $pageSettings->getSettings(), 
-                                  'id' => $medecin->idMedecin]);
+                                  'pageInfos' => $pageSettings->getSettings()]);
     }
 
     public function goDoctorSheet($id)
@@ -127,12 +126,6 @@ class PostAdministrateur extends Controller
         
         
         return view('importErrors',['erreursImport' => $erreursImport,'pageInfos' => $pageSettings->getSettings()]);
-    }
-
-    public function validForm(Request $request,$action)
-    {
-
-        $this->$action($request);
     }
 
     public function updateMedecin(Request $request,$id) {
@@ -221,7 +214,7 @@ class PostAdministrateur extends Controller
 
         $pageSettings = $this->getConfig1('Edition Medecin');
         
-        return view('editDoctor',['medecin' => $request,'pageInfos' => $pageSettings,'id' => 0]);
+        return view('editDoctor',['medecin' => $request,'pageInfos' => $pageSettings->getSettings(),'id' => '']);
 
     }
 }

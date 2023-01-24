@@ -1,17 +1,6 @@
 <!DOCTYPE html>
 <html>
-<head>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<link rel="stylesheet" type="text/css" href="css/styles.css">
-
-	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
-	<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
-
-	<title>MEDILOG</title>
-	
-</head>
-
+@include('includes/header')
 <body onload="resizeMenu()">
 	<?php
 	spl_autoload_extensions(".php");
@@ -100,17 +89,10 @@
 								<div class="d-flex flex-column text-start">
 									<span >Medecin Traitant</span>
 										<select name="medecinRef" class="form-select">
-											<?php if (isset($medecinError)) echo $medecinError; ?>
 											<option value="0">Medecin Traitant</option>
-											<?php 
-											while ($row = $medecins->fetch()) {
-												echo "<option value='". $row['numRPPS']."'";
-												if (isset($patient['medecinRef']) && $patient['medecinRef'] == $row['numRPPS']) {
-													echo "selected='selected'";
-												}
-												echo ">" . $row['nom'] . " " . $row['prenom'] . "</option>";
-											}
-											?>
+											@foreach($medecins as $medecin)
+												<option  value="{{$medecin->idMedecin}}" @selected(old('medecin') == $medecin)>{{$medecin->nom . ' ' . $medecin->prenom}}</option>
+											@endforeach
 										</select>
 										<span >Sexe</span>
 										<select name="sexe" class="form-select">
@@ -151,8 +133,7 @@
 								<input type="submit" class="bg-danger no-border text-white" value="Annuler" onclick="goTo('index','patientslist')">	
 							</div>
 							<div class="d-flex me-2 py-2 px-3 border-1 green">
-								<input type="hidden" id="controller" name="controller" value="patientslist">
-								<input type="hidden" id="action" name="action" value="<?php echo $action ?>">
+
 								<input type="submit" class="green no-border text-white" value="Valider">		
 							</div>
 						</div>

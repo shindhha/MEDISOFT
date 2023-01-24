@@ -39,7 +39,9 @@
 										<div class="col-12 col-md-6 d-flex gap-1 flex-column">
 											<select name="medecin" class="form-select text-green">
 												<option value="%">MEDECIN</option>
-												
+												@foreach($medecins as $medecin)
+												<option  value="{{$medecin->idMedecin}}" @selected(old('medecin') == $medecin)>{{$medecin->nom . ' ' . $medecin->prenom}}</option>
+												@endforeach
 											</select>
 											<select name="pValeurASMR" class="form-select text-green">
 												<option value="%"></option>
@@ -86,10 +88,8 @@
 					</div>
 					<div class="d-flex flex-row justify-content-end">
 						<div class="d-flex me-2 py-2 px-3 border-1 green">
-							<form>
-								<input type="hidden" name="nextAction" value="addPatient">
-								<input type="hidden" name="action" value="goEditPatient">
-								<input type="hidden" name="controller" value="patientslist">
+							<form method="post" action="{{route('addPatient')}}">
+								@csrf
 								<input type="submit" class="green no-border text-white" value="Ajouter un patient">
 							</form>
 						</div>
