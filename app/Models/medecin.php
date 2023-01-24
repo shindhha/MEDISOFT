@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class medecin extends Model
 {
     use HasFactory;
+    public $id = 2;
     public $nom = "";
     public $prenom = "";
     public $numRPPS = "";

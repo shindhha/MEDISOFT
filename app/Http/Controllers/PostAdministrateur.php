@@ -12,7 +12,7 @@ class PostAdministrateur extends Controller
 {
     private $importservice;
     private $adminServices;
-    public $lastDoctor;
+    private $lastDoctor;
     private $files = [["CIS_bdpm.txt","BDPM",12,false,0,"CIS_BDPM"],
                       ["CIS_CIP_bdpm.txt","CIP",13,false,4,"CIS_CIP_BDPM","codeCIP13"],
                       ["CIS_COMPO_bdpm.txt","COMPO",8,true,0,"CIS_COMPO"],
@@ -22,19 +22,23 @@ class PostAdministrateur extends Controller
                       ["CIS_GENER_bdpm.txt","GENER",5,true,2,"CIS_GENER"],
                       ["CIS_CPD_bdpm.txt","CPD",2,false,0,"CIS_CPD"],
                       ["CIS_InfoImportantes.txt","INFO",4,false,0,"CIS_INFO"]];
-   
+
+    public function getConfig1($name)
+    {
+        $pageSettings = new settings();
+        $pageSettings->setTitle($name);
+        $pageSettings->addIconToSideBar('/cabinet','article');
+        $pageSettings->addIconToSideBar('/listMedecin','groups');
+        $pageSettings->addIconToSideBar('/erreursimport','settings');
+        return $pageSettings;
+    }
     function __construct()
     {
         $this->adminServices = AdminServices::getDefaultAdminServices();
     }
     public function index() {
         $cabinet = $this->adminServices->getInformationCabinet();
-
-        $pageSettings = new settings();
-        $pageSettings->setTitle('Administrateur');
-        $pageSettings->addIconToSideBar('/cabinet','article');
-        $pageSettings->addIconToSideBar('/listMedecin','groups');
-        $pageSettings->addIconToSideBar('/erreursimport','settings');
+        $pageSettings = $this->getConfig1('Administrateur');
         return view('cabinet',["cabinet" => $cabinet,"pageInfos" => $pageSettings->getSettings()]);
     }
 
@@ -87,11 +91,7 @@ class PostAdministrateur extends Controller
     public function goListMedecins() {
         $medecins = $this->adminServices->getMedecinsList();
         $pageSettings = new settings();
-        $pageSettings->setTitle('Liste Medecin');
-        $pageSettings->addIconToSideBar('/cabinet','article');
-        $pageSettings->addIconToSideBar('/listMedecin','groups');
-        $pageSettings->addIconToSideBar('/erreursimport','settings');
-
+        $pageSettings = $this->getConfig1('Liste Medecins');
         return view('listdoctor',['medecins' => $medecins, "pageInfos" => $pageSettings->getSettings()]);
     }
 
@@ -103,14 +103,10 @@ class PostAdministrateur extends Controller
         } else {
             $medecin = $this->adminServices->getMedecin($id);
         }
-        $pageSettings = new settings();
-        $pageSettings->setTitle('Edition Medecin');
-        $pageSettings->addIconToSideBar('/cabinet','article');
-        $pageSettings->addIconToSideBar('/listMedecin','groups');
-        $pageSettings->addIconToSideBar('/erreursimport','settings');
+        $pageSettings = $this->getConfig1('Edition Medecin');
         return view('editDoctor',['medecin' => $medecin , 
                                   'pageInfos' => $pageSettings->getSettings(), 
-                                  'id' => $this->lastDoctor]);
+                                  'id' => $medecin->idMedecin]);
     }
 
     public function goDoctorSheet($id)
@@ -119,21 +115,13 @@ class PostAdministrateur extends Controller
         $this->lastDoctor = $id;
         $medecin = $this->adminServices->getMedecin($id);
         $_SESSION['idUserMedecin'] = $medecin->idUser;
-        $pageSettings = new settings();
-        $pageSettings->setTitle('Fiche Medecin');
-        $pageSettings->addIconToSideBar('/cabinet','article');
-        $pageSettings->addIconToSideBar('/listMedecin','groups');
-        $pageSettings->addIconToSideBar('/erreursimport','settings');
+        $pageSettings = $this->getConfig1('Fiche Medecin');
         return view('DoctorSheet',['id' => $this->lastDoctor,'medecin' => $medecin,'pageInfos' => $pageSettings->getSettings()]);
     }
 
     public function goErreursImport()
     {
-        $pageSettings = new settings();
-        $pageSettings->setTitle('Erreurs importation');
-        $pageSettings->addIconToSideBar('/cabinet','article');
-        $pageSettings->addIconToSideBar('/listMedecin','groups');
-        $pageSettings->addIconToSideBar('/erreursimport','settings');
+        $pageSettings = $this->getConfig1('Erreurs Importations');
         $pageSettings->addIconToNavBar('/importAll','download');
         $erreursImport = $this->adminServices->getErreursImportShort();
         
@@ -147,10 +135,10 @@ class PostAdministrateur extends Controller
         $this->$action($request);
     }
 
-    public function updateMedecin($request) {
+    public function updateMedecin(Request $request,$id) {
         try {
             DB::beginTransaction();
-            $this->adminServices->updateMedecin($this->lastDoctor,
+            $this->adminServices->updateMedecin($id,
                 $request->numRPPS ,
                 $request->nom,
                 $request->prenom,
@@ -162,9 +150,10 @@ class PostAdministrateur extends Controller
                 $request->activite,
                 $request->dateDebutActivite
             );
-            $this->adminServices->updateUser($pdo,$_SESSION['idUserMedecin'],$request->numRPPS,$request->password);
+            $idUser = DB::table('medecins')->where('idMedecin',$id)->first();
+            $this->adminServices->updateUser($idUser->idUser,$request->numRPPS,$request->password);
             DB::commit();
-            return $this->goDoctorSheet($this->lastDoctor);
+            return to_route('show',['id' => $id]);
         } catch (PDOException $e) {
             DB::rollback();
             $Errors = [];
@@ -180,12 +169,12 @@ class PostAdministrateur extends Controller
             if ($e->getCode() == "2") {
                 $Errors['date'] = ($e->getMessage());
             }
-            return $this->goEditDoctor("updateMedecin");
+            return to_route('update',['id' => $id]);
         }
 
 
 
-        return view('editDoctor');
+        return to_route('update',['id' => $id]);
 
     }
 
@@ -210,10 +199,8 @@ class PostAdministrateur extends Controller
                 $request->dateDebutActivite
             );
             DB::commit();
-            $this->lastDoctor = $idMedecin;
-            $_SESSION['idUserMedecin'] = $idUserMedecin;
             
-            return $this->goDoctorSheet(new medecin($request),$idMedecin);
+            return to_route('show',['id' => $idMedecin]);
         } catch (PDOException $e) {
             DB::rollback();
             $Errors = [];
@@ -229,9 +216,12 @@ class PostAdministrateur extends Controller
             if ($e->getCode() == "2") {
                 $Errors['date'] = ($e->getMessage());
             }
-            return redirect()->route('add');
+            
         }
-        return view('editDoctor');
+
+        $pageSettings = $this->getConfig1('Edition Medecin');
+        
+        return view('editDoctor',['medecin' => $request,'pageInfos' => $pageSettings,'id' => 0]);
 
     }
 }

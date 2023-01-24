@@ -85,7 +85,6 @@
                     </form>
                         
                     </div>
-                    <?php dd($id); ?>
             </div>
         </div>
     </div>
