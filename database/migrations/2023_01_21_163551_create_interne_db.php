@@ -89,7 +89,8 @@ return new class extends Migration
         DB::table('users')->insert(
             ['login' => 'admin','password' => md5('admin')]
         );
-        $userID = DB::table('users')->insertGetId(
+
+                $userID = DB::table('users')->insertGetId(
             ['login' => '11111111111', 'password' => md5('test')]
         );
         DB::table('medecins')->insertGetId(
@@ -110,6 +111,21 @@ return new class extends Migration
             'adresse' => 'Saint jean d\'alcapies',
             'codePostal' => 12250,
             'ville' => 'Saint affrique'
+        ]);
+        DB::table('patients')->insert([
+            'numSecu' => '1111111111111',
+            'LieuNaissance' => 'Millau',
+            'nom' => 'Medard',
+            'prenom' => 'Guillaume',
+            'dateNaissance' => date('Y-m-d'),
+            'adresse' => 'Saint Jean d alcapies',
+            'codePostal' => 12000,
+            'ville' => 'Rodez',
+            'medecinTraitant' => '11111111111',
+            'numTel' => 785515802,
+            'email' => 'guillaume.medard1@gmail.com',
+            'notes' => '',
+            'sexe' => 1
         ]);
     }
 

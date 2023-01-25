@@ -1,21 +1,8 @@
 <!DOCTYPE html>
 <html>
-<head>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
-	<link rel="stylesheet" type="text/css" href="css/styles.css">
-	<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
-	<title>MEDILOG</title>
-	
-</head>
+@include('includes/header')
 
 <body onload="resizeMenu()">
-	<?php
-	spl_autoload_extensions(".php");
-	spl_autoload_register();
-	use yasmf\HttpHelper;
-	?>
 	<div class="container-fluid h-100  text-white">
 		<div class="row h-100">
 			<!-- Menu -->
@@ -67,10 +54,10 @@
 				<div class="blue row">
 					<div class="d-flex justify-content-between">
 						<span></span>
-						<h1><?php echo $patient['nom'] . " " . $patient['prenom']?></h1>
+						<h1><?php echo $patient->nom . " " . $patient->prenom?></h1>
 						<div>
 							<?php 
-							if ($patient['sexe']) {
+							if ($patient->sexe) {
 								echo "<span class='material-symbols-outlined display-3 font-40' >
 										man
 									</span>";
@@ -93,28 +80,28 @@
 							<div class="border-top border-dark pt-3	">
 								
 								<div class="d-flex flex-row justify-content-between">
-									<div> Adresse : </div> <div> <?php echo $patient['adresse'] ?></div>
+									<div> Adresse : </div> <div> <?php echo $patient->adresse ?></div>
 								</div>
 								<div class="d-flex flex-row justify-content-between">
-									<div>n°Telephone : </div><?php echo "0".$patient['numTel'] ?>	
+									<div>n°Telephone : </div><?php echo "0".$patient->numTel ?>	
 								</div>
 								<div class="d-flex flex-row justify-content-between">
-									<div>email : </div><?php echo $patient['email'] ?>
+									<div>email : </div><?php echo $patient->email?>
 								</div>
 								<div class="d-flex flex-row justify-content-between">
-									<div>Medecin Traitant : </div><?php echo $patient['medecinRef'] != 0 ? $patient['medecinRef'] : "Non définie"; ?>
+									<div>Medecin Traitant : </div><?php echo $patient->medecinTraitant != 0 ? $patient->medecinTraitant : "Non définie"; ?>
 								</div>
 								<div class="d-flex flex-row justify-content-between">
-									<div>Numéro de sécurité sociale : </div><?php echo $patient['numSecu'] ?>
+									<div>Numéro de sécurité sociale : </div><?php echo $patient->numSecu ?>
 								</div>
 								<div class="d-flex flex-row justify-content-between">
-									<div>Date de naissance : </div><?php echo $patient['dateNaissance'] ?>		
+									<div>Date de naissance : </div><?php echo $patient->dateNaissance ?>		
 								</div>
 								<div class="d-flex flex-row justify-content-between">
-									<div>Lieu de naissance : </div><?php echo $patient['LieuNaissance'] ?>		
+									<div>Lieu de naissance : </div><?php echo $patient->LieuNaissance ?>		
 								</div>
 								<div class="d-flex flex-row justify-content-between">
-									<div>CodePostal : </div><?php echo $patient['codePostal'] ?>
+									<div>CodePostal : </div><?php echo $patient->codePostal ?>
 								</div>
 							</div>
 							
@@ -123,7 +110,7 @@
 						<div class="d-flex flex-column col-xl-3 text-start">
 							<div class="h2">Notes</div>
 							<div class="d-flex align-items-start border border-dark ratio ratio-21x9">
-								<?php echo $patient['notes'] ?>
+								<?php echo $patient->notes ?>
 							</div>
 							
 						</div>
@@ -180,18 +167,15 @@
 					<div class="h-25">
 						<div class="d-flex flex-row justify-content-center justify-content-md-end">
 							<div class="d-flex me-2 py-2 px-3 border-1 green">
-								<form>
-									<input type="hidden" name="nextAction" value="addVisite">
-									<input type="hidden" name="action" value="goEditVisite">
-									<input type="hidden" name="controller" value="patientslist">
+								<form method="post" action="{{route('addVisite')}}">
+									@csrf
+									<input type="hidden" name="idPatient" value="{{$patient->idPatient}}">
 									<input type="submit" class="green no-border text-white" value="Ajouter une visite">
 								</form>
 							</div>
 							<div class="d-flex me-2 py-2 px-3 border-1 green">
-								<form>
-									<input type="hidden" name="nextAction" value="updatePatient">
-									<input type="hidden" name="action" value="goEditPatient">
-									<input type="hidden" name="controller" value="patientslist">
+								<form method="post" action="{{route('updatePatient',['id' => $patient->idPatient])}}">
+									@csrf
 									<input type="submit" class="green no-border text-white" value="Modifier le patient">
 								</form>
 							</div>
@@ -220,7 +204,7 @@
 								<input type="hidden" name="controller" value="patientslist">
 								<input type="hidden" name="action" value="deleteVisite">
 		    					<input type="hidden" name="idVisite" value="" id ="code">
-		    					<input type="hidden" name="idPatient" value="<?php echo $_SESSION['patient'] ?>">
+		    					<input type="hidden" name="idPatient" value="">
 		    				</form>
 
 		    			</div>

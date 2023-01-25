@@ -10,6 +10,7 @@ class medecin extends Model
     use HasFactory;
     public $idMedecin = "";
     public $idPatient = "";
+    public $idVisite = "";
     public $nom = "";
     public $prenom = "";
     public $numRPPS = "";
@@ -26,6 +27,10 @@ class medecin extends Model
     public $LieuNaissance = "";
     public $notes = "";
     public $sexe = -1;
+    public $motifVisite = "";
+    public $dateVisite = "";
+    public $Description = "";
+    public $Conclusion = "";
     function __construct($array)
     {
 

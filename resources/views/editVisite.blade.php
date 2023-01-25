@@ -1,23 +1,8 @@
 <!DOCTYPE html>
 <html>
-<head>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<link rel="stylesheet" type="text/css" href="css/styles.css">
-
-	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
-	<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
-
-	<title>MEDILOG</title>
-	
-</head>
+@include('includes/header')
 
 <body onload="resizeMenu()">
-	<?php
-	spl_autoload_extensions(".php");
-	spl_autoload_register();
-	use yasmf\HttpHelper;
-	?>
 	<div class="container-fluid h-100  text-white">
 		<div class="row h-100">
 			<!-- Menu -->
@@ -63,33 +48,36 @@
 						<form>
 								<input type="hidden" name="action" value="deconnexion">
 								<input type="submit" class="btn btn-danger" value="Deconnexion">
-							</form>
+						</form>
 					</div>
 				</nav>
 				<div class="container-fluid d-flex justify-content-center">
-				<form class=" d-flex flex-column col-12 col-md-9">
+				<form method="post" action="editVisite/{{$visite->idVisite}}" class=" d-flex flex-column col-12 col-md-9">
+					<input type="hidden" name="idPatient" value="{{$idPatient}}">
+					@method('PUT')
+                    @csrf
 				<div class="flex-row  text-dark  justify-content-center mb-3">
 					<div class="d-flex flex-column gap-5">
 						<div class="d-flex flex-row justify-content-between ">
 							<div class="d-flex flex-row align-items-center"> 
-							<span>Motif: </span> <input class="form-control" type="text" name="motifVisite" value="<?php if (isset($visite['motifVisite'])) echo $visite['motifVisite']; ?>"> 
+							<span>Motif: </span> <input class="form-control" type="text" name="motifVisite" value="{{$visite->motifVisite}}"> 
 							</div>
 							
 							<div class="d-flex flex-column">
 								<span class="text-danger"><?php if (isset($dateError)) echo $dateError; ?></span>
 								<div class="d-flex flex-row align-items-center">
-									<span>Date: </span><input class="form-control" type="date" name="Date" max="<?php echo date('Y-m-d'); ?>" value="<?php if (isset($visite['dateVisite'])) echo $visite['dateVisite']; ?>">
+									<span>Date: </span><input class="form-control" type="date" name="Date" max="<?php echo date('Y-m-d'); ?>" value="{{$visite->dateVisite}}">
 								</div>
 								
 							</div>
 						</div>
 						<div class="d-flex flex-column text-start">
 							<span>Description</span>
-							<textarea rows="5" name="Description"><?php if (isset($visite['Description'])) echo $visite['Description']; ?></textarea>
+							<textarea rows="5" name="Description">{{$visite->Description}}</textarea>
 						</div>						
 						<div class="d-flex flex-column text-start	">
 							<span>Conclusion</span>
-							<textarea rows="5" name="Conclusion"><?php if (isset($visite['Conclusion'])) echo $visite['Conclusion']; ?></textarea>			
+							<textarea rows="5" name="Conclusion">{{$visite->Conclusion}}</textarea>			
 						</div>
 					</div>					
 				</div>
@@ -104,8 +92,6 @@
 								<input type="submit" class="bg-danger no-border text-white" value="Annuler" onclick="goTo('goFicheVisite','patientslist')">
 								</div>
 								<div class="d-flex me-2 py-2 px-3 border-1 green">
-									<input type="hidden" id="action" name="action" value="<?php echo $action ?>">
-									<input type="hidden" id="controller" name="controller" value="patientslist">
 									<input type="submit" class="green no-border text-white" value="Valider">
 								</div>
 							</div>

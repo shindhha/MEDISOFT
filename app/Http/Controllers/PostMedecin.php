@@ -31,7 +31,7 @@ class PostMedecin extends Controller
         $medecinTraitant = $request->medecin?: "%";
 
         $pageSettings = $this->getConfig1('Liste Patients');
-        $patients = $this->usersservices->getListPatients($medecinTraitant,$nom."%",$prenom."%");
+        $patients = $this->usersservices->getListPatients('%',"%","%");
         $medecin = $this->usersservices->getMedecins();
         return view('listPatient',['medecins' => $medecin,'patients' => $patients, 'pageInfos' => $pageSettings->getSettings()]);
     }
@@ -59,21 +59,22 @@ class PostMedecin extends Controller
 
     
 
-    public function goFichePatient($pdo)
+    public function goFichePatient($id)
     {
-        $view = new View("Sae3.3CabinetMedical/views/patient");
-        if (HttpHelper::getParam("idPatient") !== null) {
-            $_SESSION['idPatient'] = HttpHelper::getParam("idPatient");
-        }
-        
-        $visites = $this->usersservices->getVisites($pdo,$_SESSION['idPatient']);
-        $patient = $this->usersservices->getPatient($pdo,$_SESSION['idPatient']);
-        $view->setVar("visites",$visites);
-        $view->setVar("patient",$patient);
-        if (!isset($_SESSION['currentMedecin'])) {
-            $view = new View("Sae3.3CabinetMedical/views/connection");
-        }
-        return $view;
+
+
+        $visites = $this->usersservices->getVisites($id);
+        $patient = $this->usersservices->getPatient($id);
+        $pageSettings = $this->getConfig1('Fiche Patient');
+        return view('patient',['id' => $id ,'visites' => $visites, 'patient' => $patient,'pageInfos' => $pageSettings->getSettings()]);
+    }
+    public function goDoctorSheet($id)
+    {
+
+        $medecin = $this->adminServices->getMedecin($id);
+        $_SESSION['idUserMedecin'] = $medecin->idUser;
+        $pageSettings = $this->getConfig1('Fiche Medecin');
+        return view('DoctorSheet',['id' => $id,'medecin' => $medecin,'pageInfos' => $pageSettings->getSettings()]);
     }
 
     public function addPatient($pdo)
@@ -187,15 +188,12 @@ class PostMedecin extends Controller
                                   'pageInfos' => $pageSettings->getSettings()]);
     }
 
-    public function goFicheVisite($pdo)
+    public function goFicheVisite($id)
     {
-        $view = new View("Sae3.3CabinetMedical/views/visite");
-        if (HttpHelper::getParam("idVisite") !== null) {
-            $_SESSION['idVisite'] = HttpHelper::getParam("idVisite");
-        }
-        $drugsVisite = $this->usersservices->getOrdonnances($pdo,$_SESSION['idVisite']);
-        $patient = $this->usersservices->getPatient($pdo,$_SESSION['idPatient']);
-        $visite = $this->usersservices->getVisite($pdo,$_SESSION['idVisite']);
+
+        $drugsVisite = $this->usersservices->getOrdonnances($id);
+        $patient = $this->usersservices->getPatientByVisite($id);
+        $visite = $this->usersservices->getVisite($id);
         $view->setVar("visite",$visite);
         $view->setVar("drugsVisite",$drugsVisite);
         $view->setVar("patient",$patient);
@@ -205,27 +203,18 @@ class PostMedecin extends Controller
         return $view;
     }
 
-    public function goEditVisite($pdo,$action = "")
+    public function goEditVisite(Request $request,$id = null)
     {
-        $view = new View("Sae3.3CabinetMedical/views/editVisite");
         $visite;
-        $nextAction = HttpHelper::getParam("nextAction")?: $action;
-        if ($nextAction == "addVisite") {
-            $visite['motifVisite'] = HttpHelper::getParam("motifVisite");
-            $visite['dateVisite'] = HttpHelper::getParam("dateVisite");
-            $visite['Description'] = HttpHelper::getParam("Description");
-            $visite['Conclusion'] = HttpHelper::getParam("Conclusion");
+        if ($id === null) {
+            $visite = new medecin();
         } else {
             $visite = $this->usersservices->getVisite($pdo,$_SESSION['idVisite']);
         }
-
-        
-        $view->setVar("visite",$visite);
-        $view->setVar("action",$nextAction);
-        if (!isset($_SESSION['currentMedecin'])) {
-            $view = new View("Sae3.3CabinetMedical/views/connection");
-        }
-        return $view;
+        $pageSettings = $this->getConfig1('Edition de visite');
+        return view('editVisite',['visite' => $visite,
+                                  'idPatient' => $request->idPatient,
+                                  'pageInfos' => $pageSettings->getSettings()]);
     }
 
     public function deleteMedicament($pdo)
@@ -235,16 +224,11 @@ class PostMedecin extends Controller
         return $this->goFicheVisite($pdo);
     }
 
-    public function updateVisite($pdo)
+    public function updateVisite($id,Request $request)
     {
-        $view;
-        $motif = HttpHelper::getParam("motifVisite");
-        $Date = HttpHelper::getParam("Date");
-        $Description = HttpHelper::getParam("Description");
-        $Conclusion = HttpHelper::getParam("Conclusion");
         
         try {
-            $this->usersservices->modifVisite($pdo,$_SESSION['idVisite'],$motif,$Date,$Description,$Conclusion);
+            $this->usersservices->modifVisite($id,$request->motif,$request->Date,$request->Description,$request->Conclusion);
             $view = $this->goFicheVisite($pdo);
         } catch (PDOException $e) {
             $view = $this->goEditVisite($pdo,"updateVisite");
@@ -253,10 +237,10 @@ class PostMedecin extends Controller
             }
         }
         
-        return $view;
+        return to_route('showVisite');
     }
 
-    public function addVisite($pdo)
+    public function addVisite(Request $request)
     {
         $view;
         $motif = HttpHelper::getParam("motifVisite");
@@ -265,8 +249,8 @@ class PostMedecin extends Controller
         $Conclusion = HttpHelper::getParam("Conclusion");
         
         try {
-            $_SESSION['idVisite'] = $this->usersservices->insertVisite($pdo,$_SESSION['idPatient'],$motif,$Date,$Description,$Conclusion);
-            $view = $this->goFicheVisite($pdo);
+            $idVisite = $this->usersservices->insertVisite($request->idPatient,$motif,$Date,$Description,$Conclusion);
+            return to_route('showVisite',['id' => $idVisite]);
         } catch (PDOException $e) {
             $view = $this->goEditVisite($pdo,"addVisite");
             if ($e->getCode() == "22007") {

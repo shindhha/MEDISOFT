@@ -82,7 +82,40 @@
 										<th></th>
 									</tr>
 								</thead>
+								@foreach ($patients as $row) {
+								    <tr>
+										<td> {{$row->numSecu}} </td>
+										<td> {{$row->nom}} </td>
+										<td> {{$row->prenom}} </td>
+										<td> {{$row->dateNaissance}} </td>
+										<td> 0{{$row->numTel}} </td>
+										<td>  {{$row->adresse}} </td>
+					
 								
+							<td>
+								<div class="dropdown  ">
+									<span class=" material-symbols-outlined" type="button" id="dropdownMenuButton1" data-bs-auto-close="false" data-bs-toggle="dropdown" aria-expanded="false">
+										more_horiz
+									</span>
+									<div class="p-0 border-2 dropdown-menu green dropdown-menu-end text-white no-border" aria-labelledby="dropdownMenuButton1">
+										<div class="d-flex flex-column green">
+											<table class="text-white ">
+												<form action="{{route('showPatient',['id' => $row->idPatient])}}" action="POST" class="d-flex flex-column green">
+													@csrf
+													<tr><input type="submit" class="btn text-white text-decoration-underline text-end" value="Afficher"> </tr>
+												</form>
+												<form action="index.php" action="POST" class="d-flex flex-column green">
+													<input type="hidden" name="idPatient" value="<?php echo $row->idPatient ?>">
+													<a  href="#exampleModal" class="btn text-white text-decoration-underline text-end" data-bs-toggle="modal" class="btn green" name="modif" onclick="add('<?php echo  $row->nom . " " . $row->prenom . "','". $row->idPatient  ?>')">Supprimer</a>
+												</form>
+											</table>
+										</div>
+									</div>
+								</div>
+
+							</td>
+							</tr>
+							@endforeach	
 							</table>
 						</div>
 					</div>

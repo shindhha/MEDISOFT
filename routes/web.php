@@ -26,15 +26,25 @@ Route::prefix('/editDoctor')->group( function () {
     Route::match(['get','post'],'/{id}', [\App\Http\Controllers\PostAdministrateur::class,'goEditDoctor'])->name('update');
     Route::put('/{id}', [\App\Http\Controllers\PostAdministrateur::class,'updateMedecin']);
     Route::put('/', [\App\Http\Controllers\PostAdministrateur::class,'addMedecin']);
-}     
-);
+});
 
 Route::prefix('/editPatient')->group( function () {
     Route::match(['get','post'],'', [\App\Http\Controllers\PostMedecin::class,'goEditPatient'])->name('addPatient');
     Route::match(['get','post'],'/{id}', [\App\Http\Controllers\PostMedecin::class,'goEditPatient'])->name('updatePatient');
     Route::put('/{id}', [\App\Http\Controllers\PostMedecin::class,'updatePatient']);
     Route::put('/', [\App\Http\Controllers\PostMedecin::class,'addPatient']);
-}     
-);
+});
+
+Route::prefix('editVisite')->group( function () {
+        Route::post('', [\App\Http\Controllers\PostMedecin::class,'goEditVisite'])->name('addVisite');
+        Route::match(['get','post'],'/{id}', [\App\Http\Controllers\PostMedecin::class,'goEditVisite'])->name('updateVisite');
+        Route::put('/{id}', [\App\Http\Controllers\PostMedecin::class,'updateVisite']);
+        Route::put('/', [\App\Http\Controllers\PostMedecin::class,'addVisite']);
+    
+});
+
+
 Route::post('/deleteDoctor',[\App\Http\Controllers\PostAdministrateur::class,'deleteMedecin'])->name('deleteDoctor');
 Route::any('/ficheMedecin/{id}',[\App\Http\Controllers\PostAdministrateur::class,'goDoctorSheet'])->name('show');
+Route::any('/PatientSheet/{id}',[\App\Http\Controllers\PostMedecin::class,'goFichePatient'])->name('showPatient');
+Route::any('/VisiteSheet/{id}',[\App\Http\Controllers\PostMedecin::class,'goFicheVisite'])->name('showVisite');

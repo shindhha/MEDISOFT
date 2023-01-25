@@ -260,43 +260,33 @@ class UsersServices extends Model
    * @return La designation , la presentation , et les instruction du medecin associer
    *         precedement ajouter a l'ordonnance.
    */
-  public function getOrdonnances($pdo,$idVisite)
+  public function getOrdonnances($idVisite)
   {
-	$sql = "SELECT DISTINCT(Ordonnances.codeCIP7),instruction,designation,libellePresentation
-	FROM Ordonnances
-	LEFT JOIN CIS_CIP_BDPM ON CIS_CIP_BDPM.codeCIP7 = Ordonnances.codeCIP7
-	LEFT JOIN CIS_BDPM
-	ON CIS_CIP_BDPM.codeCIS = CIS_BDPM.codeCIS
-	LEFT JOIN DesignationElemPharma
-	ON DesignationElemPharma.idDesignation = CIS_BDPM.idDesignation
-	LEFT JOIN LibellePresentation
-	ON LibellePresentation.idLibellePresentation = CIS_CIP_BDPM.idLibellePresentation
-	WHERE idVisite = :idVisite";
-	$stmt = $pdo->prepare($sql);
-	$stmt->bindParam("idVisite",$idVisite);
-	$stmt->execute();
-
-	return $stmt->fetchAll();
-  }
+  	return DB::table('ordonnances')->leftJoin('cis_cip_bdpm','cis_cip_bdpm.codeCIP7','=','ordonnances.codeCIP7')
+  	                        ->leftJoin('cis_bdpm','cis_cip_bdpm.codeCIS','=','cis_bdpm.codeCIS')
+  	                        ->leftJoin('designationelems','designationelems.idDesignation','=','cis_bdpm.idDesignation')
+  	                        ->leftJoin('libellepresentations','libellepresentations.idLibellePresentation','=','cis_cip_bdpm.idLibellePresentation')
+  	                        ->where('idVisite',$idVisite)
+  	                        ->get();
+	}
   /**
    * Retourne la liste des visites du patient avec l'identifiant 'idPatient'
    * @param pdo La connexion à la base de données
    * @param idPatient Identifiant du patient dans la base de données
    * @return La liste des visites du patient dans le cabinet
    */
-  public function getVisites($pdo,$idPatient)
+  public function getVisites($idPatient)
   {
-	$sql = "SELECT motifVisite,dateVisite,Description,Conclusion,Visites.idVisite
-	FROM Visites
-	JOIN ListeVisites
-	ON ListeVisites.idVisite = Visites.idVisite
-	WHERE idPatient = :idPatient";
 
-	$stmt = $pdo->prepare($sql);
-	$stmt->bindParam("idPatient",$idPatient);
-	$stmt->execute();
-
-	return $stmt->fetchAll();
+  	return DB::table('visites')
+  	->join('listevisites','listevisites.idVisite','=','visites.idVisite')
+  	->where('idPatient',$idPatient)
+  	->get();
+  }
+  public function getPatientByVisite($idVisite)
+  {
+  	return DB::table('listevisites')->join('patients','listevisites.idPatient','=','patients.idPatient')
+  	                                ->where('idVisite',$idVisite);
   }
 
   /**
@@ -501,8 +491,9 @@ class UsersServices extends Model
 	public function getListPatients($medecinTraitant,$nom,$prenom)
 	{
 
-		return DB::table('patients')->where('nom','like',$nom)
-		                     ->where('prenom','like',$prenom)
+		return DB::table('patients')
+						->where('nom','like',$nom)
+		                ->where('prenom','like',$prenom)
 		                     ->where('medecinTraitant','like',$medecinTraitant)
 		                     ->get();
 
