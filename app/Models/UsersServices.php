@@ -5,13 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
-
+use PDOException;
 class UsersServices extends Model
 {
 	use HasFactory;
 
 	private static $defaultUsersService;
-	private $pdo;
 	public static function getDefaultUsersService()
 	{
 		if (UsersServices::$defaultUsersService == null) {
@@ -46,40 +45,23 @@ class UsersServices extends Model
      * @param notes          Notes relatives au patient
      * @throws PDOException Si le numéro de sécurité sociale est invalide (contient des lettres ou contient un nombre de charactère != 13)
      */
-	public function updatePatient($pdo,$patientID,$numSecu,$LieuNaissance,$nom,$prenom,$dateNaissance,$adresse,$codePostal,$medecinRef,$numTel,$email,$sexe,$notes)
+	public function updatePatient($patientID,$numSecu,$LieuNaissance,$nom,$prenom,$dateNaissance,$adresse,$codePostal,$medecinTraitant,$numTel,$email,$sexe,$notes)
 	{
 		if (!preg_match("#[1-9]{13}#",$numSecu)) {
 			throw new PDOException("Le numéro de sécurité sociale n'est pas valide ! ", 1);
 		}
-		$sql = "UPDATE Patients 
-		SET LieuNaissance = :LieuNaissance,
-		nom = :nom,
-		prenom = :prenom,
-		dateNaissance = :dateNaissance,
-		adresse = :adresse,
-		codePostal = :codePostal,
-		medecinRef = :medecinRef,
-		numTel = :numTel,
-		email = :email,
-		sexe = :sexe,
-		notes = :notes,
-		numSecu = :numSecu
-		WHERE idPatient = :patientID";
-
-		$stmt = $pdo->prepare($sql);
-		$stmt->execute(array('numSecu' => $numSecu,
-			'LieuNaissance' => $LieuNaissance,
-			'nom' => $nom,
-			'prenom' => $prenom,
-			'dateNaissance' => $dateNaissance,
-			'adresse' => $adresse,
-			'codePostal' => $codePostal,
-			'medecinRef' => $medecinRef,
-			'numTel' => $numTel,
-			'email' => $email,
-			'sexe' => $sexe,
-			'notes' => $notes,
-			'patientID' => $patientID));
+		DB::table('patients')->update(['LieuNaissance' => $LieuNaissance,
+	                                   'nom' => $nom,
+	                                   'prenom' => $prenom,
+	                                   'dateNaissance' => $dateNaissance,
+	                                   'adresse' => $adresse,
+	                                   'codePostal' => $codePostal,
+	                                   'medecinTraitant' => $medecinTraitant,
+	                                   'numTel' => $numTel,
+	                                   'email' => $email,
+	                                   'sexe' => $sexe,
+	                                   'notes' => $notes])
+	                         ->where('idPatient',$idPatient);
 
 	}
   /**
@@ -93,11 +75,10 @@ class UsersServices extends Model
    * @param codeCIS     Identifiant du medicament 
    * @param instruction Nouvlles intructions du medecin pour se medicament dans cette visite
    */
-  public function editInstruction($pdo,$idVisite,$codeCIP,$instruction)
+  public function editInstruction($idVisite,$codeCIP7,$instruction)
   {
-	$sql = "UPDATE Ordonnances SET instruction = :instruction WHERE idVisite = :idVisite AND codeCIP7 = :codeCIP";
-	$stmt = $pdo->prepare($sql);
-	$stmt->execute(array('instruction' => $instruction, 'idVisite' => $idVisite, 'codeCIP' => $codeCIP));
+  	DB::table('ordonnances')->update(['instruction' => $instruction])->where('idVisite',$idVisite)
+  	                                                                 ->where('codeCIP7',$codeCIP7);
   }
 
   /**
@@ -115,12 +96,11 @@ class UsersServices extends Model
    * @param idVisite L'identifiant de la viste dans la base de données
    * @param codeCIS  L'identifiant du medicament
    */
-  public function deleteMedicament($pdo,$idVisite,$codeCIP)
+  public function deleteMedicament($idVisite,$codeCIP7)
   {
-	$sql = "DELETE FROM Ordonnances WHERE idVisite = :idVisite AND codeCIP7 = :codeCIP";
-
-	$stmt = $pdo->prepare($sql);
-	$stmt->execute(array('idVisite' => $idVisite, 'codeCIP' => $codeCIP));
+  	DB::table('ordonnances')->where('idVisite',$idVisite)
+  	                        ->where('codeCIP7',$codeCIP7)
+  	                        ->delete();
   }
   /**
    * Supprime toute les occurences du patient avec l'identifiant 
@@ -129,12 +109,9 @@ class UsersServices extends Model
    * @param table La table dans laquelle supprimer le patient
    * @param idPatient L'identifiant du patient a supprimer
    */
-  public function deletePatientFrom($pdo,$table,$idPatient)
+  public function deletePatientFrom($table,$idPatient)
   {
-	$sql = "DELETE FROM " . $table . " WHERE idPatient = :idPatient";
-	$stmt = $pdo->prepare($sql);
-	$stmt->bindParam("idPatient",$idPatient);
-	$stmt->execute();
+  	DB::table($table)->where('idPatient',$idPatient)->delete();
   }
   /**
    * Insere un nouveau patient dans la base de données
@@ -155,29 +132,25 @@ class UsersServices extends Model
    * @throws PDOException  Si le numéro de sécurité sociale est invalide (contient des lettres ou contient un nombre de charactère != 13)
    * @return l'Identifiant Du patient dans la base de données venant d'être crée
    */
-  public function insertPatient($pdo,$numSecu,$LieuNaissance,$nom,$prenom,$dateNaissance,$adresse,$codePostal,$ville,$medecinRef,$numTel,$email,$sexe,$notes)
+  public function insertPatient($numSecu,$LieuNaissance,$nom,$prenom,$dateNaissance,$adresse,$codePostal,$ville,$medecinTraitant,$numTel,$email,$sexe,$notes)
   {
 	if (!preg_match("#[1-9]{13}#",$numSecu)) {
 		throw new PDOException("Le numéro de sécurité sociale n'est pas valide ! ", 1);
 	}
-	$sql = "INSERT INTO Patients (numSecu,LieuNaissance,nom,prenom,dateNaissance,adresse,codePostal,medecinRef,numTel,email,sexe,notes,ville) VALUES (:numSecu,:LieuNaissance,:nom,:prenom,:dateNaissance,:adresse,:codePostal,:medecinRef,:numTel,:email,:sexe,:notes, :ville)";
-	$stmt = $pdo->prepare($sql);
-	$stmt->execute(array('numSecu' => $numSecu,
-		'LieuNaissance' => $LieuNaissance,
-		'nom' => $nom,
-		'prenom' => $prenom,
-		'dateNaissance' => $dateNaissance,
-		'adresse' => $adresse,
-		'codePostal' => $codePostal,
-		'medecinRef' => $medecinRef,
-		'numTel' => $numTel,
-		'email' => $email,
-		'sexe' => $sexe,
-		'notes' => $notes,
-		'ville' => $ville)
-  );
-	return $pdo->lastInsertId();
 
+	return DB::table('patients')->insertGetId(['numSecu' => $numSecu,
+                                        'LieuNaissance' => $LieuNaissance,
+                                        'nom' => $nom,
+                                        'prenom' => $prenom,
+                                        'dateNaissance' => $dateNaissance,
+                                        'adresse' => $adresse,
+                                        'codePostal' => $codePostal,
+                                        'ville' => $ville,
+                                        'medecinTraitant' => $medecinTraitant,
+                                        'numTel' => $numTel,
+                                        'email' => $email,
+                                        'sexe' => $sexe,
+                                        'notes' => $notes]);
   }
 
   /**
@@ -190,20 +163,13 @@ class UsersServices extends Model
    * @param Description Description du déroulement de la consultation
    * @param Conclusion  Le traitement que prescrit le médecin au patient 
    */
-  public function modifVisite($pdo,$idVisite,$motifVisite,$dateVisite,$Description,$Conclusion)
+  public function modifVisite($idVisite,$motifVisite,$dateVisite,$Description,$Conclusion)
   {
-	$sql = "UPDATE Visites 
-	SET motifVisite = :motifVisite,
-	dateVisite = :dateVisite,
-	Description = :Description,
-	Conclusion = :Conclusion
-	WHERE idVisite = :idVisite";
-	$stmt = $pdo->prepare($sql);
-	$stmt->execute(array('motifVisite' => $motifVisite,
-		'dateVisite' => $dateVisite,
-		'Description' => $Description,
-		'Conclusion' => $Conclusion,
-		'idVisite' => $idVisite));
+  	DB::table('visites')->update(['motifVisite' => $motifVisite,
+                                  'dateVisite' => $dateVisite,
+                                  'Description' => $Description,
+                                  'Conclusion' => $Conclusion])
+  	                    ->where('idVisite',$idVisite);
   }
 
 
@@ -213,13 +179,9 @@ class UsersServices extends Model
    * @param table     La table dans laquelle supprimer le patient
    * @param idVisite  L'identifiant de la visite 
    */
-  public function deleteVisiteFrom($pdo,$table,$idVisite)
+  public function deleteVisiteFrom($table,$idVisite)
   {
-	$sql = "DELETE FROM " . $table . " WHERE idVisite = :idVisite";
-
-	$stmt = $pdo->prepare($sql);
-	$stmt->bindParam('idVisite',$idVisite);
-	$stmt->execute();
+  	DB::table($table)->where('idVisite',$idVisite)->delete();
   }
   /**
    * Insere une nouvelle visite pour le patient n° 'idPatient'
@@ -232,24 +194,17 @@ class UsersServices extends Model
    * @param Conclusion     Le traitement que prescrit le médecin au patient 
    * @return L'identifiant de la visite venant d'être insérer
    */
-  public function insertVisite($pdo,$idPatient,$motifVisite,$dateVisite,$Description,$Conclusion)
+  public function insertVisite($idPatient,$motifVisite,$dateVisite,$Description,$Conclusion)
   {
-	$sql1 = "INSERT INTO Visites (motifVisite,dateVisite,Description,Conclusion)
-	VALUES (:motifVisite,:dateVisite,:Description,:Conclusion)";
+
+  	$lastInsertId = DB::table('visites')->insertGetId(['motifVisite' => $motifVisite,
+                                       'dateVisite' => $dateVisite,
+                                       'Description' => $Description,
+                                       'Conclusion' => $Conclusion]);
+  	DB::table('listevisites')->insert(['idPatient' => $idPatient,
+                                       'idVisite' => $lastInsertId,
+                                       'idMedecin' => 1]);
 	
-
-	$sql2 = "INSERT INTO ListeVisites (idPatient,idVisite) VALUES (:idPatient,LAST_INSERT_ID())";
-
-	$stmt = $pdo->prepare($sql1);
-	$stmt->execute(array('motifVisite' => $motifVisite,
-		'dateVisite' => $dateVisite,
-		'Description' => $Description,
-		'Conclusion' => $Conclusion));
-	$lastInsertId = $pdo->lastInsertId();
-
-	$stmt = $pdo->prepare($sql2);
-
-	$stmt->execute(array('idPatient' => $idPatient));
 	return $lastInsertId;
   }
   /**
@@ -286,7 +241,7 @@ class UsersServices extends Model
   public function getPatientByVisite($idVisite)
   {
   	return DB::table('listevisites')->join('patients','listevisites.idPatient','=','patients.idPatient')
-  	                                ->where('idVisite',$idVisite);
+  	                                ->where('idVisite',$idVisite)->first();
   }
 
   /**
@@ -298,17 +253,10 @@ class UsersServices extends Model
    *         La description du déroulement de la consultation
    *         Le traitement que prescrit le médecin au patient 
    */
-  public function getVisite($pdo,$idVisite)
+  public function getVisite($idVisite)
   {
-	$sql = "SELECT motifVisite,dateVisite,Description,Conclusion,Visites.idVisite
-	FROM Visites
-	WHERE idVisite = :idVisite";
-
-	$stmt = $pdo->prepare($sql);
-	$stmt->bindParam("idVisite",$idVisite);
-	$stmt->execute();
-
-	return $stmt->fetch();
+  	return Db::table('visites')->where('idVisite',$idVisite)
+  	                    ->first();
   }
   /**
    * Retourne les information du patient avec l'identifiant 'idPatient'
@@ -333,99 +281,7 @@ class UsersServices extends Model
   	return DB::table('patients')->where('idPatient',$idPatient)->first();
   }
 
-  public function getMedicament($pdo,$codeCIP)
-  {
-	$sql = "
-	SELECT 
-	CIS_BDPM.codeCIS as codeCIS,
-	designation,
-	formePharma,
-	StatutAdAMM.statutAdAMM as statutAdAMM,
-	typeProc,
-	autoEur,
-	tauxRemboursement,
-	codeCIP7,
-	libellePresentation,
-	statutAdminiPresentation,
-	labelEtatCommercialisation,
-	dateCommrcialisation,
-	codeCIP13,
-	agrementCollectivites,
-	prix,
-	IndicationRemboursement,
-	labelGroupeGener,
-	typeGenerique,
-	numeroTri,
-	labelElem,
-	codesubstance,
-	labelDosage,
-	labelRefDosage,
-	labelVoieAdministration,
-	labelcondition,
-	dateDebutInformation,
-	dateFinInformation,
-	labelTexte,
-	labelTitulaire,
-	dateAMM
-	FROM CIS_BDPM
-	LEFT JOIN DesignationElemPharma
-	ON CIS_BDPM.idDesignation = DesignationElemPharma.idDesignation
-	LEFT JOIN FormePharma
-	ON CIS_BDPM.idFormePharma = FormePharma.idFormePharma
-	LEFT JOIN StatutAdAMM
-	ON CIS_BDPM.idStatutAdAMM = StatutAdAMM.idStatutAdAMM
-	LEFT JOIN TypeProc
-	ON CIS_BDPM.idTypeProc = TypeProc.idTypeProc
-	LEFT JOIN AutorEurop
-	ON CIS_BDPM.idAutoEur = AutorEurop.idAutoEur
-	LEFT JOIN TauxRemboursement
-	ON CIS_BDPM.codeCIS = TauxRemboursement.codeCIS
-	LEFT JOIN CIS_CIP_BDPM
-	ON CIS_CIP_BDPM.codeCIS = CIS_BDPM.codeCIS
-	LEFT JOIN LibellePresentation
-	ON CIS_CIP_BDPM.idLibellePresentation = LibellePresentation.idLibellePresentation
-	LEFT JOIN EtatCommercialisation
-	ON CIS_CIP_BDPM.idEtatCommercialisation = EtatCommercialisation.idEtatCommercialisation
-	LEFT JOIN CIS_GENER
-	ON CIS_GENER.codeCIS = CIS_BDPM.codeCIS
-	LEFT JOIN GroupeGener
-	ON CIS_GENER.idGroupeGener = GroupeGener.idGroupeGener
-	LEFT JOIN CIS_COMPO
-	ON CIS_COMPO.codeCIS = CIS_BDPM.codeCIS
-	LEFT JOIN DesignationElem
-	ON CIS_COMPO.idDesignationElemPharma = DesignationElem.idElem
-	LEFT JOIN CodeSubstance
-	ON CIS_COMPO.idCodeSubstance = CodeSubstance.idSubstance
-	AND CIS_COMPO.varianceNomSubstance = CodeSubstance.varianceNom
-	LEFT JOIN Dosage
-	ON CIS_COMPO.idDosage = Dosage.idDosage
-	LEFT JOIN RefDosage
-	ON CIS_COMPO.idRefDosage = RefDosage.idRefDosage
-	LEFT JOIN CIS_VoieAdministration
-	ON CIS_BDPM.codeCIS = CIS_VoieAdministration.codeCIS
-	LEFT JOIN ID_Label_VoieAdministration
-	ON CIS_VoieAdministration.idVoieAdministration = ID_Label_VoieAdministration.idVoieAdministration
-	LEFT JOIN CIS_CPD
-	ON CIS_CPD.codeCIS = CIS_BDPM.codeCIS
-	LEFT JOIN LabelCondition
-	ON CIS_CPD.idCondition = LabelCondition.idCondition
-	LEFT JOIN CIS_INFO
-	ON CIS_BDPM.codeCIS = CIS_INFO.codeCIS
-	LEFT JOIN Info_Texte
-	ON CIS_INFO.idTexte = Info_Texte.idTexte
-	LEFT JOIN CIS_Titulaires
-	ON CIS_BDPM.codeCIS = CIS_Titulaires.codeCIS
-	LEFT JOIN ID_Label_Titulaire
-	ON CIS_Titulaires.idTitulaire = ID_Label_Titulaire.idTitulaire
-	WHERE codeCIP7 = :codeCIP
-	";
-	$stmt = $pdo->prepare($sql);
-
-	$stmt->bindParam('codeCIP',$codeCIP);
-	$stmt->execute();
-
-	return $stmt->fetch();
-  }
+  
 
   public function getAllSMR($pdo, $codeCIP)
   {
@@ -499,45 +355,7 @@ class UsersServices extends Model
 
 
 	}
-	public function getListMedic($pdo,$formePharma = "%",$labelVoieAdministration = "%",$etatCommercialisation = -1,$tauxRemboursement = "",$prixMin = 0,$prixMax = 100000,$surveillanceRenforcee = -1,$valeurASMR = "%",$libelleNiveauSMR = "%", $designation = "%")
-	{
-		$sql = "SELECT codeCIS,formePharma,labelVoieAdministration,etatCommercialisation,tauxRemboursement,prix,libellePresentation,surveillanceRenforcee,valeurASMR,libelleNiveauSMR,codeCIP7,designation
-		FROM listMedic
-		WHERE formePharma LIKE :formePharma 
-		AND labelVoieAdministration LIKE :labelVoieAdministration
-		AND designation LIKE :designation
-		AND prix >= :prixMin AND prix < :prixMax 
-		AND valeurASMR LIKE :valeurASMR 
-		AND libelleNiveauSMR LIKE :libelleNiveauSMR 
-		";
-		$param = array('formePharma' => $formePharma,
-			'labelVoieAdministration' => $labelVoieAdministration,
-			'prixMin' => $prixMin,
-			'prixMax' => $prixMax,
-			'designation' => $designation,
-			'valeurASMR' => $valeurASMR,
-			'libelleNiveauSMR' => $libelleNiveauSMR);
-
-		if ($etatCommercialisation != -1) {
-			$sql = $sql . " AND etatCommercialisation = :etatCommercialisation";
-			$param['etatCommercialisation'] = $etatCommercialisation;
-		}
-
-		if ($tauxRemboursement != "") {
-			$sql = $sql . " AND tauxRemboursement = :tauxRemboursement";
-			$param['tauxRemboursement'] = $tauxRemboursement;
-		}
-
-		if ($surveillanceRenforcee != -1) {
-			$sql = $sql . " AND surveillanceRenforcee = :surveillanceRenforcee";
-			$param['surveillanceRenforcee'] = $surveillanceRenforcee;
-		}
-		$sql .= " LIMIT 1000";
-		$stmt = $pdo->prepare($sql);
-		$stmt->execute($param);
-
-		return $stmt->fetchAll();
-	}
+	
   /**
    * Ajoute le medicament avec l'identifiant 'codeCIS' avec
    * les 'instruction' ajouter par le medecin à la visite avec 
@@ -548,12 +366,11 @@ class UsersServices extends Model
    * @param instruction Les instructions d'utilisation du medicament
    *                    ajouter par le médecin
    */
-  public function addMedic($pdo,$idVisite,$codeCIP,$instruction)
+  public function addMedic($idVisite,$codeCIP7,$instruction)
   {
-	$sql = "INSERT INTO Ordonnances (idVisite,codeCIP7,instruction) VALUES (:idVisite,:codeCIP,:instruction)";
-
-	$stmt = $pdo->prepare($sql);
-	$stmt->execute(array("idVisite" => $idVisite, "codeCIP" => $codeCIP, "instruction" => $instruction));
+  	Db::table('ordonnances')->insert(['idVisite' => $idVisite,
+                                      'codeCIP7' => $codeCIP7,
+                                      'instruction' => $instruction]);
   }
 
 
@@ -566,14 +383,10 @@ class UsersServices extends Model
    * @return Une occurences de chaque valeur différentes
    *         Dans la colonne 'param' dans la table 'table'
    */
-  public function getparams($pdo,$param,$table)
+  public function getparams($param,$table)
   {
-	$sql = "SELECT DISTINCT(" . $param .")"
-		. " FROM " . $table
-		. " ORDER BY " . $param;
-
-		return $pdo->query($sql);
-	}
+  	return Db::table($table)->select($param)->distinct()->orderBy($param)->get();
+}
 
 
 	/**

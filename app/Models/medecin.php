@@ -31,14 +31,4 @@ class medecin extends Model
     public $dateVisite = "";
     public $Description = "";
     public $Conclusion = "";
-    function __construct($array)
-    {
-
-        if ($array != null) {
-           foreach ($array as $key => $value) {
-            $this->$key = $value ?: "";
-            }
-        } 
-        
-    }
 }

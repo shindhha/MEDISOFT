@@ -2,93 +2,50 @@
 <html>
 @include('includes/header')
 <body onload="resizeMenu()">
-	<?php
-	spl_autoload_extensions(".php");
-	spl_autoload_register();
-	use yasmf\HttpHelper;
-	?>
 	<div class="container-fluid h-100  text-white">
 		<div class="row h-100">
 			<!-- Menu -->
-			<div id="menu" class="pt-3 menu z-index-dropdown col-md-1 col-4 d-md-flex d-none flex-column gap-3 blue h-100 align-items-center">
-				<span onclick="manageClass('menu','d-none')"class="material-symbols-outlined d-block d-md-none text-end w-100">arrow_back</span>
-				<div class=" green border-1 ratio ratio-1x1">
-
-				</div>
-				<a href="index.php?controller=medicamentslist" class="d-md-none">
-					<div class="text-white green border-1 ratio ratio-1x1">
-						<span class="d-flex display-3 align-items-center justify-content-center material-symbols-outlined">
-							medication
-						</span>
-					</div>
-				</a>
-				<a href="index.php?controller=patientslist" class="d-md-none">
-					<div  class=" text-white green border-1 ratio ratio-1x1">
-						<span class="d-flex display-3 justify-content-center align-items-center material-symbols-outlined">
-							groups
-						</span>
-					</div>
-				</a>
-				<a href="index.php?controller=medicamentslist" class="text-white d-none d-md-block green border-1 ratio ratio-1x1">
-
-                    <span class="d-flex display-3 align-items-center justify-content-center material-symbols-outlined">
-                        medication
-                    </span>
-                </a>
-                <a href="index.php?controller=patientslist" class=" text-white d-none d-md-block green border-1 ratio ratio-1x1">
-                    <span class="d-flex display-3 justify-content-center align-items-center material-symbols-outlined">
-                        groups
-                    </span>
-                </a>
-			</div>
+			@include('includes/sideBar')
 			<!-- Main page -->
 			<div class="col-md-11 h-75 text-center">
 				<!-- Bandeau outils -->	
 				
-				<nav class="  row h-11 navbar navbar-expand-lg navbar-light green">
-					<div class="d-flex px-md-5 container-fluid green">
-						<span class="material-symbols-outlined text-start d-block d-md-none" onclick="manageClass('menu','d-none')">menu</span>
-						<span class="h1"> Fiche Patient </span>
-						<form>
-								<input type="hidden" name="action" value="deconnexion">
-								<input type="submit" class="btn btn-danger" value="Deconnexion">
-							</form>
-					</div>
-				</nav>
+				@include('includes/navbar')
 				<!-- Bandeau Patient -->
-				<form>
-
+				<form method="post" action="/editPatient/{{$id}}">
+					@method('PUT')
+                    @csrf
 					<div class="d-flex justify-content-center ">
 						<div class="d-flex flex-column col-12 col-md-8">
 							<div class="d-flex flex-row  justify-content-around text-green">
 								<div class="d-flex flex-column text-start">
 										<span class="" >Nom</span>
 										<div class="d-flex ">
-											<input class="form-control " type="text" name="nom" value="<?php if (isset($patient['nom'])) echo $patient['nom']; ?>"> 
+											<input class="form-control " type="text" name="nom" value="{{$patient->nom}}"> 
 										</div>
 										<span class="" >Prenom</span>
-										<div><input class="form-control" type="text" name="prenom" value="<?php if (isset($patient['prenom'])) echo $patient['prenom']; ?>"> </div>
+										<div><input class="form-control" type="text" name="prenom" value="{{$patient->prenom}}"> </div>
 										<span class="" >Adresse</span>
-										<div><input class="form-control" type="text" name="adresse" value="<?php if (isset($patient['adresse'])) echo $patient['adresse']; ?>"> 
+										<div><input class="form-control" type="text" name="adresse" value="{{$patient->adresse}}"> 
 										</div>
 										<span class="" >Code Postal</span>
 										<div>
 											<?php if (isset($codePostalError)) echo $codePostalError; ?>
-											<input class="form-control" type="number" name="codePostal" min="1001" max="98800" value="<?php if (isset($patient['codePostal'])) echo $patient['codePostal']; ?>">
+											<input class="form-control" type="number" name="codePostal" min="1001" max="98800" value="{{$patient->codePostal}}">
 										</div>
                                         <span class="" >Ville</span>
                                         <div>
                                             <?php if (isset($villeError)) echo $villeError; ?>
-                                            <input class="form-control" type="text" name="ville" min="1001" max="98800" value="<?php if (isset($patient['ville'])) echo $patient['ville']; ?>">
+                                            <input class="form-control" type="text" name="ville" min="1001" max="98800" value="{{$patient->ville}}">
                                         </div>
 										<span class="" >n°Telephone</span>
-										<div><input class="form-control" type="number" name="numTel" max="999999999" value="<?php if (isset($patient['numTel'])) echo $patient['numTel']; ?>">
+										<div><input class="form-control" type="number" name="numTel" max="999999999" value="{{$patient->numTel}}">
 										</div>
 
 								</div>
 								<div class="d-flex flex-column text-start">
 									<span >Medecin Traitant</span>
-										<select name="medecinRef" class="form-select">
+										<select name="medecinTraitant" class="form-select">
 											<option value="0">Medecin Traitant</option>
 											@foreach($medecins as $medecin)
 												<option  value="{{$medecin->idMedecin}}" @selected(old('medecin') == $medecin)>{{$medecin->nom . ' ' . $medecin->prenom}}</option>
@@ -102,34 +59,36 @@
 										<span >Numéro sécurité sociale</span>
 										<div>
 											<?php if (isset($numSecuError)) echo $numSecuError; ?>
-											<input class="form-control" type="text" name="numSecu" value="<?php if (isset($patient['numSecu'])) echo $patient['numSecu']; ?>">
+											<input class="form-control" type="text" name="numSecu" value="{{$patient->numSecu}}">
 										</div>
 										<span >Date Naissance</span>
-										<div><input class="form-control" type="date" max="<?php echo date('Y-m-d'); ?>" name="dateNaissance" value="<?php if (isset($patient['dateNaissance'])) echo $patient['dateNaissance']; ?>">
+										<div><input class="form-control" type="date" max="<?php echo date('Y-m-d'); ?>" name="dateNaissance" value="{{$patient->dateNaissance}}">
 										</div>
 										<span >Lieu Naissance</span>
-										<div><input class="form-control" type="text" name="LieuNaissance" value="<?php if (isset($patient['LieuNaissance'])) echo $patient['LieuNaissance']; ?>">
+										<div><input class="form-control" type="text" name="LieuNaissance" value="{{$patient->LieuNaissance}}">
 										</div>
                                         <span>Email</span>
                                         <div>
+
                                             <?php if (isset($emailError)) echo $emailError; ?>
-                                            <input class="form-control" type="text" name="email" value="<?php if (isset($patient['email'])) echo $patient['email']; ?>">
+                                            <input class="form-control" type="text" name="email" value="{{$patient->email}}">
                                         </div>
 								</div>
 							</div>
 						</div>
 					</div>
+
 					<div class="d-flex justify-content-center">
 						<div class="d-flex col-12 col-md-10 text-start mb-2 flex-column text-green">
 							<h1>Notes</h1> 
-							<textarea  name="notes" rows="12" cols="33"><?php if (isset($patient['notes'])) echo $patient['notes'];?></textarea>
+							<textarea  name="notes" rows="12" cols="33">{{$patient->notes}}</textarea>
 						</div>
 					</div>
+
 						<!-- Portail de connexion -->
 					<div class="d-flex justify-content-end justify-content-md-center">
 						<div class="d-flex col-md-10 flex-row justify-content-between">	
 							<div class="d-flex me-2 py-2 px-3 border-1 bg-danger">
-								<input type="hidden" name="controller" value="patientslist">
 								<input type="submit" class="bg-danger no-border text-white" value="Annuler" onclick="goTo('index','patientslist')">	
 							</div>
 							<div class="d-flex me-2 py-2 px-3 border-1 green">
@@ -137,6 +96,7 @@
 								<input type="submit" class="green no-border text-white" value="Valider">		
 							</div>
 						</div>
+
 					</div>
 				</form>
 			</div>

@@ -6,37 +6,7 @@
 	<div class="container-fluid h-100  text-white">
 		<div class="row h-100">
 			<!-- Menu -->
-			<div id="menu" class="pt-3 menu z-index-dropdown col-md-1 col-4 d-md-flex d-none flex-column gap-3 blue h-100 align-items-center">
-				<span onclick="manageClass('menu','d-none')"class="material-symbols-outlined d-block d-md-none text-end w-100">arrow_back</span>
-				<div class=" green border-1 ratio ratio-1x1">
-
-				</div>
-				<a href="index.php?controller=medicamentslist" class="d-md-none">
-					<div class="text-white green border-1 ratio ratio-1x1">
-						<span class="d-flex display-3 align-items-center justify-content-center material-symbols-outlined">
-							medication
-						</span>
-					</div>
-				</a>
-				<a href="index.php?controller=patientslist" class="d-md-none">
-					<div  class=" text-white green border-1 ratio ratio-1x1">
-						<span class="d-flex display-3 justify-content-center align-items-center material-symbols-outlined">
-							groups
-						</span>
-					</div>
-				</a>
-				<a href="index.php?controller=medicamentslist" class="text-white d-none d-md-block green border-1 ratio ratio-1x1">
-
-                    <span class="d-flex display-3 align-items-center justify-content-center material-symbols-outlined">
-                        medication
-                    </span>
-                </a>
-                <a href="index.php?controller=patientslist" class=" text-white d-none d-md-block green border-1 ratio ratio-1x1">
-                    <span class="d-flex display-3 justify-content-center align-items-center material-symbols-outlined">
-                        groups
-                    </span>
-                </a>
-			</div>
+			@include('includes/sideBar')
 			<!-- Main page -->
 			<div class="col-md-11 h-75 text-center">
 				<!-- Bandeau outils -->	
@@ -52,7 +22,7 @@
 					</div>
 				</nav>
 				<div class="container-fluid d-flex justify-content-center">
-				<form method="post" action="editVisite/{{$visite->idVisite}}" class=" d-flex flex-column col-12 col-md-9">
+				<form method="post" action="/editVisite/{{$id}}" class=" d-flex flex-column col-12 col-md-9">
 					<input type="hidden" name="idPatient" value="{{$idPatient}}">
 					@method('PUT')
                     @csrf

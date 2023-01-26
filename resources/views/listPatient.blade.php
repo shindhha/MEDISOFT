@@ -27,12 +27,12 @@
 							</div>
 							<!-- Filtre -->
 							<div class="dropdown-toggle" type="button" id="dropdownMenuClickable" data-bs-toggle="dropdown" data-bs-auto-close="false" aria-expanded="false">
-            					Filtres
-            				</div>
-            				<div class="dropdown-menu p-0 z-index-dropdown dropdown-menu-end col-10 col-md-5 "  aria-labelledby="dropdownMenuClickable">
-            					<div class="container-fluid green p-4 z-index-dropdown">
-            						<div class="row gap-1 gap-md-0">
-            							<div class="col-12 col-md-6 d-flex gap-1 flex-column">
+								Filtres
+							</div>
+							<div class="dropdown-menu p-0 z-index-dropdown dropdown-menu-end col-10 col-md-5 "  aria-labelledby="dropdownMenuClickable">
+								<div class="container-fluid green p-4 z-index-dropdown">
+									<div class="row gap-1 gap-md-0">
+										<div class="col-12 col-md-6 d-flex gap-1 flex-column">
 											<input type="date" class="form-control" name="dateMin">	
 											<input type="date" class="form-control" name="dateMax">
 										</div>
@@ -49,23 +49,23 @@
 												?>
 											</select>
 										</div>
-            						</div>
-            					</div>
-            				</div>
+									</div>
+								</div>
+							</div>
 						</form>
 						<form class="ms-2">
-								<input type="hidden" name="action" value="deconnexion">
-								<input type="submit" class="btn btn-danger" value="Deconnexion">
+							<input type="hidden" name="action" value="deconnexion">
+							<input type="submit" class="btn btn-danger" value="Deconnexion">
 						</form>
 					</div>
 
 				</nav>
 
-					<!-- content -->
+				<!-- content -->
 				<div class="container-fluid h-100">
 					<span class="fs-1 d-md-none d-sm-block text-green"> Liste Patients </span>
 					<div class=" d-flex text-green justify-content-start">
-						 résultats
+						résultats
 					</div>
 					<div class="d-flex h-75 align-items-center justify-content-center">
 						<div class="table-responsive h-75 border border-success align-middle">
@@ -82,40 +82,40 @@
 										<th></th>
 									</tr>
 								</thead>
-								@foreach ($patients as $row) {
-								    <tr>
-										<td> {{$row->numSecu}} </td>
-										<td> {{$row->nom}} </td>
-										<td> {{$row->prenom}} </td>
-										<td> {{$row->dateNaissance}} </td>
-										<td> 0{{$row->numTel}} </td>
-										<td>  {{$row->adresse}} </td>
-					
-								
-							<td>
-								<div class="dropdown  ">
-									<span class=" material-symbols-outlined" type="button" id="dropdownMenuButton1" data-bs-auto-close="false" data-bs-toggle="dropdown" aria-expanded="false">
-										more_horiz
-									</span>
-									<div class="p-0 border-2 dropdown-menu green dropdown-menu-end text-white no-border" aria-labelledby="dropdownMenuButton1">
-										<div class="d-flex flex-column green">
-											<table class="text-white ">
-												<form action="{{route('showPatient',['id' => $row->idPatient])}}" action="POST" class="d-flex flex-column green">
-													@csrf
-													<tr><input type="submit" class="btn text-white text-decoration-underline text-end" value="Afficher"> </tr>
-												</form>
-												<form action="index.php" action="POST" class="d-flex flex-column green">
-													<input type="hidden" name="idPatient" value="<?php echo $row->idPatient ?>">
-													<a  href="#exampleModal" class="btn text-white text-decoration-underline text-end" data-bs-toggle="modal" class="btn green" name="modif" onclick="add('<?php echo  $row->nom . " " . $row->prenom . "','". $row->idPatient  ?>')">Supprimer</a>
-												</form>
-											</table>
+								@foreach ($patients as $patient) 
+								<tr>
+									<td> {{$patient->numSecu}} </td>
+									<td> {{$patient->nom}} </td>
+									<td> {{$patient->prenom}} </td>
+									<td> {{$patient->dateNaissance}} </td>
+									<td> 0{{$patient->numTel}} </td>
+									<td>  {{$patient->adresse}} </td>
+									
+									
+									<td>
+										<div class="dropdown  ">
+											<span class=" material-symbols-outlined" type="button" id="dropdownMenuButton1" data-bs-auto-close="false" data-bs-toggle="dropdown" aria-expanded="false">
+												more_horiz
+											</span>
+											<div class="p-0 border-2 dropdown-menu green dropdown-menu-end text-white no-border" aria-labelledby="dropdownMenuButton1">
+												<div class="d-flex flex-column green">
+													<table class="text-white ">
+														<form action="{{route('showPatient',['id' => $patient->idPatient])}}" action="POST" class="d-flex flex-column green">
+															@csrf
+															<tr><input type="submit" class="btn text-white text-decoration-underline text-end" value="Afficher"> </tr>
+														</form>
+														<form action="index.php" action="POST" class="d-flex flex-column green">
+															<input type="hidden" name="idPatient" value="{{$patient->idPatient}}">
+															<a  href="#exampleModal" class="btn text-white text-decoration-underline text-end" data-bs-toggle="modal" class="btn green" onclick="add('{{$patient->nom}}  {{$patient->prenom}}','{{$patient->idPatient}}')">Supprimer</a>
+														</form>
+													</table>
+												</div>
+											</div>
 										</div>
-									</div>
-								</div>
 
-							</td>
-							</tr>
-							@endforeach	
+									</td>
+								</tr>
+								@endforeach	
 							</table>
 						</div>
 					</div>
@@ -129,37 +129,16 @@
 					</div>
 				</div>
 			</div>
-			<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-		 		<div class="modal-dialog modal-md modal-dialog-centered">
 
-		    		<div class="modal-content ">
-		    			<div class = "h5 col-12 green d-flex text-start p-3 align-middle">
-		    				<span id ="libelle"></span>
-		    			</div>
-		    			<div class="text-center text-danger d-flex flex-column">
-		    				<span>Etes vous sur de vouloir supprimer le patient ?</span>
-		    				<span>Toutes ses visites seront perdue .</span>
-		    			</div>
-		    			<div class = "d-flex justify-content-end p-3 gap-3">
-		    				<input type="submit" class="green no-border text-white me-2 py-2 px-3 border-1" data-bs-dismiss="modal" value="Annuler">
-		    				<form>		
-		    					<input type="submit" class="green no-border text-white me-2 py-2 px-3 border-1" value="confirmer">
-								<input type="hidden" name="controller" value="patientslist">
-								<input type="hidden" name="action" value="deletePatient">
-		    					<input type="hidden" name="idPatient" value="" id ="code">
-		    				</form>
 
-		    			</div>
-		    			
-		    			
-		    		</div>
-				</div>
-			</div>
+			@include('includes/popup')
+
+			
 
 		</div>
 
 
-		<script type="text/javascript" src="scripts/script.js"></script>
+		<script type="text/javascript" src="{{asset('t.js')}}"></script>
 		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"></script>
 	</div>
 </body>

@@ -54,7 +54,7 @@ return new class extends Migration
         Schema::create('listevisites', function (Blueprint $table) {
             $table->unsignedBigInteger('idVisite');
             $table->unsignedBigInteger('idPatient');
-            $table->unsignedBigInteger('idMedecin');
+            $table->unsignedBigInteger('idMedecin')->default(11111111111);
             $table->primary(['idVisite','idPatient']);
         });
         Schema::create('cabinet', function (Blueprint $table) {
@@ -65,9 +65,9 @@ return new class extends Migration
         });
         Schema::create('ordonnances', function (Blueprint $table) {
             $table->unsignedBigInteger('idVisite');
-            $table->integer('codeCIS');
+            $table->integer('codeCIP7');
             $table->text('instruction');
-            $table->primary(['idVisite','codeCIS']);
+            $table->primary(['idVisite','codeCIP7']);
         });
         Schema::create('users', function (Blueprint $table) {
             $table->id();
@@ -90,7 +90,7 @@ return new class extends Migration
             ['login' => 'admin','password' => md5('admin')]
         );
 
-                $userID = DB::table('users')->insertGetId(
+        $userID = DB::table('users')->insertGetId(
             ['login' => '11111111111', 'password' => md5('test')]
         );
         DB::table('medecins')->insertGetId(

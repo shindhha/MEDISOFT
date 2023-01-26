@@ -6,16 +6,19 @@
 				<span id ="libelle"></span>
 			</div>
 			<div class="text-center text-danger d-flex flex-column">
-				<span>Etes vous sur de vouloir supprimer le patient ?</span>
-				<span>Toutes ses visites seront perdue .</span>
+				@foreach($pageInfos['popUpSettings']['texts'] as $text)
+				<span>{{$text['text']}}</span>
+				@endforeach
 			</div>
 			<div class = "d-flex justify-content-end p-3 gap-3">
 				<input type="submit" class="green no-border text-white me-2 py-2 px-3 border-1" data-bs-dismiss="modal" value="Annuler">
-				<form>		
+				<form method="post" action="{{route($pageInfos['popUpSettings']['route'])}}">
+					@csrf
+					@foreach($pageInfos['popUpSettings']['variables'] as $variable)
+					<input type="hidden" name="{{$variable['name']}}" value="" id ="code">
+					@endforeach
 					<input type="submit" class="green no-border text-white me-2 py-2 px-3 border-1" value="confirmer">
-					<input type="hidden" name="controller" value="patientslist">
-					<input type="hidden" name="action" value="deletePatient">
-					<input type="hidden" name="idPatient" value="" id ="code">
+					
 				</form>
 
 			</div>

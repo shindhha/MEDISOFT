@@ -13,6 +13,7 @@ return new class extends Migration
      */
     public function up()
     {
+
         Schema::create('designationelems', function (Blueprint $table) {
             $table->id('idDesignation');
             $table->text('designation');
@@ -48,7 +49,7 @@ return new class extends Migration
         });
         Schema::create('tauxremboursements', function (Blueprint $table) {
             $table->unsignedBigInteger('codeCIS');
-            $table->double('autoEur',6,2);
+            $table->double('tauxRemboursement',6,2);
             $table->primary(['codeCIS']);
         });
         Schema::create('libellepresentations', function (Blueprint $table) {
@@ -248,7 +249,38 @@ return new class extends Migration
             $table->foreign('idMotifEval')->references('idMotifEval')->on('motifeval');
             $table->foreign('idLibelleASMR')->references('idLibelleASMR')->on('libelleasmr');
         });
+        DB::statement("CREATE VIEW listMedic as
+            select CIS_BDPM.codeCIS,formePharma,labelVoieAdministration,etatCommercialisation,tauxRemboursement,prix,libellePresentation,surveillanceRenforcee,valeurASMR,libelleNiveauSMR,codeCIP7,designation 
+            from CIS_BDPM
+            LEFT JOIN CIS_CIP_BDPM
+            ON CIS_BDPM.codeCIS = CIS_CIP_BDPM.codeCIS
+            LEFT JOIN CIS_VoieAdministrations
+            ON CIS_BDPM.codeCIS = CIS_VoieAdministrations.codeCIS
+            LEFT JOIN CIS_HAS_SMR
+            ON CIS_BDPM.codeCIS = CIS_HAS_SMR.codeCIS
+            LEFT JOIN CIS_HAS_ASMR
+            ON CIS_BDPM.codeCIS = CIS_HAS_ASMR.codeCIS
+            LEFT JOIN FormePharmas
+            ON CIS_BDPM.idFormePharma = FormePharmas.idFormePharma
+            LEFT JOIN ID_Label_VoieAdministrations
+            ON CIS_VoieAdministrations.idVoieAdministration = ID_Label_VoieAdministrations.idVoieAdministration
+            LEFT JOIN TauxRemboursements
+            ON CIS_BDPM.codeCIS = TauxRemboursements.codeCIS
+            LEFT JOIN LibellePresentations
+            ON LibellePresentations.idLibellePresentation = CIS_CIP_BDPM.idLibellePresentation
+            LEFT JOIN NiveauSMR
+            ON NiveauSMR.idNiveauSMR = CIS_HAS_SMR.niveauSMR
+            LEFT JOIN DesignationElems
+            ON CIS_BDPM.idDesignation = designationelems.idDesignation
+            LEFT JOIN CIS_COMPO
+            ON CIS_BDPM.codeCIS = CIS_COMPO.codeCIS
+            LEFT JOIN labelsubstances
+            ON labelsubstances.idSubstance = CIS_COMPO.idCodeSubstance
+            AND labelsubstances.varianceNom = CIS_COMPO.varianceNomSubstance");
+
     }
+
+
 
     /**
      * Reverse the migrations.
@@ -291,6 +323,7 @@ return new class extends Migration
         Schema::dropIfExists('cis_has_smr');
         Schema::dropIfExists('cis_has_asmr');
         Schema::dropIfExists('erreursimportations');
+        DB::statement("DROP VIEW IF EXISTS listMedic");
         Schema::enableForeignKeyConstraints();
     }
 };

@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-
+use App\Models\UsersServices;
+use App\Models\DrugsServices;
+use App\Models\settings;
 class PostMedicament extends Controller
 {
     private $usersservices;
@@ -11,56 +13,51 @@ class PostMedicament extends Controller
     public function __construct()
     {
         $this->usersservices = UsersServices::getDefaultUsersService();
+        $this->drugsServices = DrugsServices::getDefaultDrugsServices();
     }
-    public function index($pdo) {
-        $view = new View("Sae3.3CabinetMedical/views/medicamentsList");
-        $pformePharma = HttpHelper::getParam("pformePharma") !== null ? HttpHelper::getParam("pformePharma") : "%" ;
-        $pVoieAdmi = HttpHelper::getParam("pVoieAdmi") !== null ? HttpHelper::getParam("pVoieAdmi") : "%" ;
-        $pTauxRem = HttpHelper::getParam("pTauxRem") !== null ? HttpHelper::getParam("pTauxRem") : "";
-        $pPrixMin = (int) HttpHelper::getParam("pPrixMin");
-        $pPrixMax = (int) HttpHelper::getParam("pPrixMax") == 0 ? 10000 : (int) HttpHelper::getParam("pPrixMax");
-        $pEtat =  HttpHelper::getParam("pEtat") !== null ? (int) HttpHelper::getParam("pEtat") : -1;
-        $pSurveillance = HttpHelper::getParam("pSurveillance") !== null ? (int) HttpHelper::getParam("pSurveillance") : -1;
-        $pNiveauSmr = HttpHelper::getParam("pNiveauSmr") !== null ?  HttpHelper::getParam("pNiveauSmr") : "%";
-        $pValeurASMR = HttpHelper::getParam("pValeurASMR") !== null ?  HttpHelper::getParam("pValeurASMR") : "%";
-        $pDesignation = HttpHelper::getParam("pDesignation");
-        $valeurASMR = $this->usersservices->getparams($pdo,"valeurASMR","cis_has_asmr");
-        $formePharmas = $this->usersservices->getparams($pdo,"formePharma","FormePharma");
-        $voieAdministration = $this->usersservices->getparams($pdo,"labelVoieAdministration","ID_Label_VoieAdministration");
-        $niveauSmr = $this->usersservices->getparams($pdo,"libelleNiveauSMR","niveauSmr");
-        $tauxRemboursements = $this->usersservices->getparams($pdo,"tauxRemboursement","TauxRemboursement");
-        $drugs = $this->usersservices->getListMedic($pdo,$pformePharma,$pVoieAdmi,$pEtat,$pTauxRem,$pPrixMin,$pPrixMax,$pSurveillance,$pValeurASMR,$pNiveauSmr,"%" . $pDesignation . "%");
-
-
-        $view->setVar("pDesignation",$pDesignation);
-        $view->setVar("pValeurASMR",$pValeurASMR);
-        $view->setVar("pNiveauSmr",$pNiveauSmr);
-        $view->setVar("niveauSmr",$niveauSmr);
-        $view->setVar("valeurASMR",$valeurASMR);
-        $view->setVar("pformePharma",$pformePharma);
-        $view->setVar("pVoieAdmi",$pVoieAdmi);
-        $view->setVar("pTauxRem",$pTauxRem);
-        $view->setVar("pPrixMin",$pPrixMin);
-        $view->setVar("pPrixMax",$pPrixMax);
-        $view->setVar("pEtat",$pEtat);
-        $view->setVar("pSurveillance",$pSurveillance);
-        $view->setVar("tauxRemboursements",$tauxRemboursements);
-        $view->setVar("voieAd",$voieAdministration);
-        $view->setVar("formePharmas",$formePharmas);
-        $view->setVar("drugs",$drugs);
-        if (!isset($_SESSION['currentMedecin'])) {
-            $view = new View("Sae3.3CabinetMedical/views/connection");
-        }
-        return $view;
+    public function index(Request $request) {
+        $pformePharma = $request->pformePharma !== null ? $request->pformePharma : "%" ;
+        $pVoieAdmi = $request->pVoieAdmi !== null ? $request->pVoieAdmi : "%" ;
+        $pTauxRem = $request->pTauxRem !== null ? $request->pTauxRem : "";
+        $pPrixMin = (int) $request->pPrixMin;
+        $pPrixMax = (int) $request->pPrixMax == 0 ? 10000 : (int) $request->pPrixMax;
+        $pEtat =  $request->pEtat !== null ? (int) $request->pEtat : -1;
+        $pSurveillance = $request->pSurveillance !== null ? (int) $request->pSurveillance : -1;
+        $pNiveauSmr = $request->pNiveauSmr !== null ?  $request->pNiveauSmr : "%";
+        $pValeurASMR = $request->pValeurASMR !== null ?  $request->pValeurASMR : "%";
+        $pDesignation = $request->pDesignation;
+        $valeurASMR = $this->usersservices->getparams("valeurASMR","cis_has_asmr");
+        $formePharmas = $this->usersservices->getparams("formePharma","FormePharmas");
+        $voieAdministration = $this->usersservices->getparams("labelVoieAdministration","ID_Label_VoieAdministrations");
+        $niveauSmr = $this->usersservices->getparams("libelleNiveauSMR","niveauSmr");
+        $tauxRemboursements = $this->usersservices->getparams("tauxRemboursement","TauxRemboursements");
+        $drugs = $this->drugsServices->getListMedic($pformePharma,$pVoieAdmi,$pEtat,$pTauxRem,$pPrixMin,$pPrixMax,$pSurveillance,$pValeurASMR,$pNiveauSmr,"%" . $pDesignation . "%");
+        $pageSettings = settings::getDefaultConfigMedecin('Liste Medicaments');
+        return view('medicamentsList',['pDesignation' => $pDesignation,
+                                       'pValeurASMR' => $pValeurASMR,
+                                       'valeurASMR' => $valeurASMR,
+                                       'niveauSmr' => $niveauSmr,
+                                       'pformePharma' => $pformePharma,
+                                       'pVoieAdmi' => $pVoieAdmi,
+                                       'pTauxRem' => $pTauxRem,
+                                       'pPrixMin' => $pPrixMin,
+                                       'pPrixMax' => $pPrixMax,
+                                       'pEtat' => $pEtat,
+                                       'pSurveillance' => $pSurveillance,
+                                       'tauxRemboursements' => $tauxRemboursements,
+                                       'formePharmas' => $formePharmas,
+                                       'voieAdministration' => $voieAdministration,
+                                       'drugs' => $drugs,
+                                       'pageInfos' => $pageSettings->getSettings()]);
 
 
     }
-
-    public function goFicheMedicament($pdo)
+/*
+    public function goFicheMedicament(Request $request)
     {
         $view = new View("Sae3.3CabinetMedical/views/medicament");
 
-        $codeCIP = HttpHelper::getParam("codeCIP7");
+        $codeCIP = $request->codeCIP7;
         $medicament = $this->usersservices->getMedicament($pdo,$codeCIP);
         $lteSmr = $this->usersservices->getAllSMR($pdo,$codeCIP);
         $lteASMR = $this->usersservices->getAllASMR($pdo,$codeCIP);
@@ -72,5 +69,5 @@ class PostMedicament extends Controller
             $view = new View("Sae3.3CabinetMedical/views/connection");
         }
         return $view;
-    }
+    }*/
 }

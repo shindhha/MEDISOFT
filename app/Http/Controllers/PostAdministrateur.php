@@ -23,22 +23,13 @@ class PostAdministrateur extends Controller
                       ["CIS_CPD_bdpm.txt","CPD",2,false,0,"CIS_CPD"],
                       ["CIS_InfoImportantes.txt","INFO",4,false,0,"CIS_INFO"]];
 
-    public function getConfig1($name)
-    {
-        $pageSettings = new settings();
-        $pageSettings->setTitle($name);
-        $pageSettings->addIconToSideBar('/cabinet','article');
-        $pageSettings->addIconToSideBar('/listMedecin','groups');
-        $pageSettings->addIconToSideBar('/erreursimport','settings');
-        return $pageSettings;
-    }
     function __construct()
     {
         $this->adminServices = AdminServices::getDefaultAdminServices();
     }
     public function index() {
         $cabinet = $this->adminServices->getInformationCabinet();
-        $pageSettings = $this->getConfig1('Administrateur');
+        $pageSettings = settings::getDefaultConfigAdministrateur('Administrateur');
         return view('cabinet',["cabinet" => $cabinet,"pageInfos" => $pageSettings->getSettings()]);
     }
 
@@ -91,7 +82,7 @@ class PostAdministrateur extends Controller
     public function goListMedecins() {
         $medecins = $this->adminServices->getMedecinsList();
         $pageSettings = new settings();
-        $pageSettings = $this->getConfig1('Liste Medecins');
+        $pageSettings = settings::getDefaultConfigAdministrateur('Liste Medecins');
         return view('listdoctor',['medecins' => $medecins, "pageInfos" => $pageSettings->getSettings()]);
     }
 
@@ -103,7 +94,7 @@ class PostAdministrateur extends Controller
         } else {
             $medecin = $this->adminServices->getMedecin($id);
         }
-        $pageSettings = $this->getConfig1('Edition Medecin');
+        $pageSettings = settings::getDefaultConfigAdministrateur('Edition Medecin');
         return view('editDoctor',['medecin' => $medecin , 
                                   'pageInfos' => $pageSettings->getSettings()]);
     }
@@ -114,13 +105,13 @@ class PostAdministrateur extends Controller
         $this->lastDoctor = $id;
         $medecin = $this->adminServices->getMedecin($id);
         $_SESSION['idUserMedecin'] = $medecin->idUser;
-        $pageSettings = $this->getConfig1('Fiche Medecin');
+        $pageSettings = settings::getDefaultConfigAdministrateur('Fiche Medecin');
         return view('DoctorSheet',['id' => $this->lastDoctor,'medecin' => $medecin,'pageInfos' => $pageSettings->getSettings()]);
     }
 
     public function goErreursImport()
     {
-        $pageSettings = $this->getConfig1('Erreurs Importations');
+        $pageSettings = settings::getDefaultConfigAdministrateur('Erreurs Importations');
         $pageSettings->addIconToNavBar('/importAll','download');
         $erreursImport = $this->adminServices->getErreursImportShort();
         
@@ -212,7 +203,7 @@ class PostAdministrateur extends Controller
             
         }
 
-        $pageSettings = $this->getConfig1('Edition Medecin');
+        $pageSettings = settings::getDefaultConfigAdministrateur('Edition Medecin');
         
         return view('editDoctor',['medecin' => $request,'pageInfos' => $pageSettings->getSettings(),'id' => '']);
 

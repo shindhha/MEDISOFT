@@ -6,7 +6,8 @@ use Illuminate\Http\Request;
 use App\Models\UsersServices;
 use App\Models\settings;
 use App\Models\medecin;
-
+use Illuminate\Support\Facades\DB;
+use PDOException;
 class PostMedecin extends Controller
 {
     private $usersservices;
@@ -15,45 +16,41 @@ class PostMedecin extends Controller
     {
         $this->usersservices = UsersServices::getDefaultUsersService();
     }
-    public function getConfig1($name)
-    {
-        $pageSettings = new settings();
-        $pageSettings->setTitle($name);
-        $pageSettings->addIconToSideBar('/cabinet','article');
-        $pageSettings->addIconToSideBar('/listMedecin','groups');
-        return $pageSettings;
-    }
-    public function index(Request $request) {
+    public function index(Request $request = null) {
 
-        $textInput = $request->search? explode(" ", $request->search) : "%"; 
+        $textInput = $request != null ? explode(" ", $request->search) : "%"; 
         $nom = $textInput[0]?: "";
         $prenom = isset($textInput[1]) == true ? $textInput[1] : $textInput[0];
-        $medecinTraitant = $request->medecin?: "%";
+        $medecinTraitant = $request != null ? $request->medecin : "%";
 
-        $pageSettings = $this->getConfig1('Liste Patients');
+        $pageSettings = settings::getDefaultConfigMedecin('Liste Patients');
+        $pageSettings->setRoute('deletePatient');
+        $pageSettings->addVariable('idPatient');
+        $pageSettings->addText('Etes vous sur de vouloir supprimer le patient ?');
+        $pageSettings->addText('Toutes ses visites seront perdue .');
         $patients = $this->usersservices->getListPatients('%',"%","%");
         $medecin = $this->usersservices->getMedecins();
         return view('listPatient',['medecins' => $medecin,'patients' => $patients, 'pageInfos' => $pageSettings->getSettings()]);
     }
 
-    public function deletePatient($pdo)
+    public function deletePatient(Request $request)
     {
-        $idPatient = HttpHelper::getParam("idPatient");
+        $idPatient = $request->idPatient;
         try {
-            $pdo->beginTransaction();
-            $visites = $this->usersservices->getVisites($pdo,$idPatient);
-            $this->usersservices->deletePatientFrom($pdo,"ListeVisites",$idPatient);
-            $this->usersservices->deletePatientFrom($pdo,"Patients",$idPatient);
+            DB::beginTransaction();
+            $visites = $this->usersservices->getVisites($idPatient);
+            $this->usersservices->deletePatientFrom("ListeVisites",$idPatient);
+            $this->usersservices->deletePatientFrom("Patients",$idPatient);
             foreach ($visites as $visite) {
-                $this->usersservices->deleteVisiteFrom($pdo,"Ordonnances",$visite['idVisite']);
-                $this->usersservices->deleteVisiteFrom($pdo,"Visites",$visite['idVisite']);
+                $this->usersservices->deleteVisiteFrom("Ordonnances",$visite->idVisite);
+                $this->usersservices->deleteVisiteFrom("Visites",$visite->idVisite);
             }
-            $pdo->commit();
+            DB::commit();
         } catch (PDOException $e) {
-            $pdo->rollback();
+            DB::rollback();
         }
         
-        return $this->index($pdo);
+        return $this->index();
         
     }
 
@@ -65,111 +62,67 @@ class PostMedecin extends Controller
 
         $visites = $this->usersservices->getVisites($id);
         $patient = $this->usersservices->getPatient($id);
-        $pageSettings = $this->getConfig1('Fiche Patient');
+        $pageSettings = settings::getDefaultConfigMedecin('Fiche Patient');
+        $pageSettings->setRoute('deleteVisite');
+        $pageSettings->addVariable('idVisite');
+        $pageSettings->addText('Etes vous sur de vouloir supprimer la visite ?');
+        $pageSettings->addText('Touts ses médicaments seront perdue .');
         return view('patient',['id' => $id ,'visites' => $visites, 'patient' => $patient,'pageInfos' => $pageSettings->getSettings()]);
     }
-    public function goDoctorSheet($id)
+
+    public function addPatient(Request $request)
     {
 
-        $medecin = $this->adminServices->getMedecin($id);
-        $_SESSION['idUserMedecin'] = $medecin->idUser;
-        $pageSettings = $this->getConfig1('Fiche Medecin');
-        return view('DoctorSheet',['id' => $id,'medecin' => $medecin,'pageInfos' => $pageSettings->getSettings()]);
-    }
-
-    public function addPatient($pdo)
-    {
-        $numSecu = HttpHelper::getParam("numSecu");
-        $view;
-        $nom = HttpHelper::getParam("nom");
-        $prenom = HttpHelper::getParam("prenom");
-        $adresse = HttpHelper::getParam("adresse");
-        $numTel = HttpHelper::getParam("numTel");
-        $email = HttpHelper::getParam("email");
-        $medecinRef = HttpHelper::getParam("medecinRef");
-        $dateNaissance = HttpHelper::getParam("dateNaissance");
-        $LieuNaissance = HttpHelper::getParam("LieuNaissance");
-        $notes = HttpHelper::getParam("notes");
-        $codePostal = HttpHelper::getParam("codePostal");
-        $ville = HttpHelper::getParam("ville");
-        $sexe = (int) HttpHelper::getParam("sexe");
-
         try {
-            $_SESSION['idPatient'] = $this->usersservices->insertPatient($pdo,$numSecu,$LieuNaissance,$nom,$prenom,$dateNaissance,$adresse,$codePostal,$ville,$medecinRef,$numTel,$email,$sexe,$notes);
+            $idPatient = $this->usersservices->insertPatient($request->numSecu,$request->LieuNaissance,$request->nom,$request->prenom,$request->dateNaissance,$request->adresse,$request->codePostal,$request->ville,$request->medecinTraitant,$request->numTel,$request->email,$request->sexe,$request->notes);
 
-            $view = $this->goFichePatient($pdo);
+            return to_route('showPatient',['id' => $idPatient]);
 
         } catch (PDOException $e) {
-            $view = $this->goEditPatient($pdo,"addPatient");
-            if ($e->getCode() == "23000") {
-                $view->setVar("numSecuError","Ce numéro de sécurité sociale est déjà utilisé ! ");
-            }
-            if ($e->getCode() == "HY000") {
-                $view->setVar("emailError","L'adresse mail n'est pas valide ! ");
-            }
-            if ($e->getCode() == "1") {
-                $view->setVar("numSecuError",$e->getMessage());
-            }
+           throw new PDOException($e->getMessage(), $e->getCode());
+           
         }
-        
-        
-        return $view;
+        $pageSettings = settings::getDefaultConfigMedecin('Edition Patient');
+        $medecins = $this->usersservices->getMedecins();
+        return view('editPatient',['patient' => $request,
+                                   'medecins' => $medecins,
+                                   'pageInfos' => $pageSettings->getSettings(),
+                                   'id' => '']);
     }
 
-    public function updatePatient($pdo)
+    public function updatePatient(Request $request,$id)
     {   
 
-        $numSecu = HttpHelper::getParam("numSecu");
-        
-
-        $view;
-        $nom = HttpHelper::getParam("nom");
-        $prenom = HttpHelper::getParam("prenom");
-        $adresse = HttpHelper::getParam("adresse");
-        $numTel = HttpHelper::getParam("numTel");
-        $email = HttpHelper::getParam("email");
-        $medecinRef = HttpHelper::getParam("medecinRef");
-        $dateNaissance = HttpHelper::getParam("dateNaissance");
-        $LieuNaissance = HttpHelper::getParam("LieuNaissance");
-        $notes = HttpHelper::getParam("notes");
-        $codePostal = HttpHelper::getParam("codePostal");
-        $sexe = (int) HttpHelper::getParam("sexe");
         try {
-            $this->usersservices->updatePatient($pdo,$_SESSION['idPatient'],$numSecu,$LieuNaissance,$nom,$prenom,$dateNaissance,$adresse,$codePostal,$medecinRef,$numTel,$email,$sexe,$notes);
-            $view = $this->goFichePatient($pdo);
+            $this->usersservices->updatePatient($id,$request->numSecu,$request->LieuNaissance,$request->nom,$request->prenom,$request->dateNaissance,$request->adresse,$request->codePostal,$request->medecinTraitant,$request->numTel,$request->email,$request->sexe,$request->notes);
+            return to_route('showPatient',['id' => $id]);
         } catch (PDOException $e) {
-            $view = $this->goEditPatient($pdo,"updatePatient");
-            if ($e->getCode() == "23000") {
-                $view->setVar("numSecuError","Ce numéro de sécurité sociale est déjà utilisé ! ");
-            }
-            if ($e->getCode() == "HY000") {
-                $view->setVar("emailError","L'adresse mail n'est pas valide ! ");
-            }
-            if ($e->getCode() == "1") {
-                $view->setVar("numSecuError",$e->getMessage());
-            }
+           
         }
-        
-        return $view;
+        $pageSettings = settings::getDefaultConfigMedecin('Edition Patient');
+        $medecins = $this->usersservices->getMedecins();
+        return view('editPatient',['patient' => $request,
+                                   'medecins' => $medecins,
+                                   'pageInfos' => $pageSettings->getSettings(),
+                                   'id' => $id]);
 
     }
 
-    public function deleteVisite($pdo)
+    public function deleteVisite(Request $request)
     {   
-
-        $idVisite = HttpHelper::getParam("idVisite");
+        $id = $request->idVisite;
         try {
-            $pdo->beginTransaction();
-            $this->usersservices->deleteVisiteFrom($pdo,"Ordonnances",$idVisite);
-            $this->usersservices->deleteVisiteFrom($pdo,"ListeVisites",$idVisite);
-            $this->usersservices->deleteVisiteFrom($pdo,"Visites",$idVisite);
-            $pdo->commit();
+            DB::beginTransaction();
+            $this->usersservices->deleteVisiteFrom("Ordonnances",$id);
+            $this->usersservices->deleteVisiteFrom("ListeVisites",$id);
+            $this->usersservices->deleteVisiteFrom("Visites",$id);
+            DB::commit();
         } catch (PDOException $e) {
-            $pdo->rollback();
+            DB::rollback();
         }
         
 
-        return $this->goFichePatient($pdo);
+        return to_route('ListMedicament');
     }
 
     public function goEditPatient($id = null,Request $request = null)
@@ -182,9 +135,10 @@ class PostMedecin extends Controller
         }
         
         $medecins = $this->usersservices->getMedecins();
-        $pageSettings = $this->getConfig1('Fiche Patient');
+        $pageSettings = settings::getDefaultConfigMedecin('Fiche Patient');
         return view('editPatient',['patient' => $patient,
-                                  'medecins' => $medecins , 
+                                  'medecins' => $medecins ,
+                                  'id' => $id,
                                   'pageInfos' => $pageSettings->getSettings()]);
     }
 
@@ -194,13 +148,13 @@ class PostMedecin extends Controller
         $drugsVisite = $this->usersservices->getOrdonnances($id);
         $patient = $this->usersservices->getPatientByVisite($id);
         $visite = $this->usersservices->getVisite($id);
-        $view->setVar("visite",$visite);
-        $view->setVar("drugsVisite",$drugsVisite);
-        $view->setVar("patient",$patient);
-        if (!isset($_SESSION['currentMedecin'])) {
-            $view = new View("Sae3.3CabinetMedical/views/connection");
-        }
-        return $view;
+        $pageSettings = settings::getDefaultConfigMedecin('Fiche Visite');
+        
+        return view('visite',['id' => $id,
+                                  'drugsVisite' => $drugsVisite,
+                                  'patient' => $patient,
+                                  'visite' => $visite,
+                                  'pageInfos' => $pageSettings->getSettings()]);
     }
 
     public function goEditVisite(Request $request,$id = null)
@@ -209,11 +163,13 @@ class PostMedecin extends Controller
         if ($id === null) {
             $visite = new medecin();
         } else {
-            $visite = $this->usersservices->getVisite($pdo,$_SESSION['idVisite']);
+            $visite = $this->usersservices->getVisite($id);
         }
-        $pageSettings = $this->getConfig1('Edition de visite');
+        $pageSettings = settings::getDefaultConfigMedecin('Edition de visite');
+
         return view('editVisite',['visite' => $visite,
                                   'idPatient' => $request->idPatient,
+                                  'id' => $visite->idVisite,
                                   'pageInfos' => $pageSettings->getSettings()]);
     }
 
@@ -242,23 +198,17 @@ class PostMedecin extends Controller
 
     public function addVisite(Request $request)
     {
-        $view;
-        $motif = HttpHelper::getParam("motifVisite");
-        $Date = HttpHelper::getParam("Date");
-        $Description = HttpHelper::getParam("Description");
-        $Conclusion = HttpHelper::getParam("Conclusion");
-        
         try {
-            $idVisite = $this->usersservices->insertVisite($request->idPatient,$motif,$Date,$Description,$Conclusion);
+            $idVisite = $this->usersservices->insertVisite($request->idPatient,$request->motifVisite,$request->Date,$request->Description,$request->Conclusion);
             return to_route('showVisite',['id' => $idVisite]);
         } catch (PDOException $e) {
-            $view = $this->goEditVisite($pdo,"addVisite");
-            if ($e->getCode() == "22007") {
-                $view->setVar("dateError","Veuillez sélectionner la date.");
-            }
+
         }
-        
-        return $view;
+        $pageSettings = settings::getDefaultConfigMedecin('Edition de visite');
+        return view('editVisite',['idPatient' => $request->idPatient,
+                                  'id' => '',
+                                  'visite' => $request,
+                                  'pageInfos' => $pageSettings->getSettings()]);
     }
 
     public function addMedicament($pdo)

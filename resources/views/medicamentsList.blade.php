@@ -1,57 +1,12 @@
 	<!DOCTYPE html>
 <html>
-<head>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<link rel="stylesheet" type="text/css" href="css/styles.css">
-
-	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
-	<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
-	
-	<title>MEDILOG</title>
-	
-</head>
+@include('includes/header')
 
 <body onload="resizeMenu()">
-	<?php
-	spl_autoload_extensions(".php");
-	spl_autoload_register();
-	use yasmf\HttpHelper;
-	?>
 	<div class="container-fluid h-100  text-white ">
 		<div class="row h-100">
 			<!-- Menu -->
-			<div id="menu" class="pt-3 menu z-index-dropdown col-md-1 col-4 d-md-flex d-none flex-column gap-3 blue h-100 align-items-center">
-				<span onclick="manageClass('menu','d-none')"class="material-symbols-outlined d-block d-md-none text-end w-100">arrow_back</span>
-				<div class=" green border-1 ratio ratio-1x1">
-
-				</div>
-				<a href="index.php?controller=medicamentslist" class="d-md-none">
-					<div class="text-white green border-1 ratio ratio-1x1">
-						<span class="d-flex display-3 align-items-center justify-content-center material-symbols-outlined">
-							medication
-						</span>
-					</div>
-				</a>
-				<a href="index.php?controller=patientslist" class="d-md-none">
-					<div  class=" text-white green border-1 ratio ratio-1x1">
-						<span class="d-flex display-3 justify-content-center align-items-center material-symbols-outlined">
-							groups
-						</span>
-					</div>
-				</a>
-				<a href="index.php?controller=medicamentslist" class="text-white d-none d-md-block green border-1 ratio ratio-1x1">
-
-                    <span class="d-flex display-3 align-items-center justify-content-center material-symbols-outlined">
-                        medication
-                    </span>
-                </a>
-                <a href="index.php?controller=patientslist" class=" text-white d-none d-md-block green border-1 ratio ratio-1x1">
-                    <span class="d-flex display-3 justify-content-center align-items-center material-symbols-outlined">
-                        groups
-                    </span>
-                </a>
-			</div>
+			@include('includes/sideBar')
 			<!-- Main page -->
 			<div class="col-md-11 h-100 text-center">
 				<!-- Bandeau outils -->	
@@ -65,7 +20,7 @@
 						<form class=" d-flex align-items-center justify-content-end" action="index.php" method="POST">
 							<input type="hidden" name="controller" value="medicamentslist">
 							<div class="d-flex me-2 py-2 px-3 bg-white border-1 col-7 col-md-10 justify-content-end">
-								<input name="pDesignation" class="no-border form-control" type="search" placeholder="Designation" value="<?php echo $pDesignation; ?>" onkeyup="showHint(this.value)" aria-label="Search">
+								<input name="pDesignation" class="no-border form-control" type="search" placeholder="Designation" value="{{$pDesignation}}" onkeyup="showHint(this.value)" aria-label="Search">
 								<input type="submit" class="no-border bg-white material-symbols-outlined text-black" value="search">  
 
 							</div>
@@ -79,55 +34,36 @@
             							<div class="col-12 col-md-6 d-flex gap-1 flex-column">
 											<select name="pNiveauSmr" class="form-select text-green">
 												<option value="%">Valeur SMR</option>
-												<?php
-												while ($row = $niveauSmr->fetch()) {
-													echo "<option";
-													if ($pNiveauSmr == $row['libelleNiveauSMR']) echo " selected='selected'";
-													echo ">" . $row['libelleNiveauSMR'] . "</option>";
-												}
-												?>
+												@foreach($niveauSmr as $nSmr)
+												<option @selected(old('pNiveauSmr') == $nSmr)>{{$nSmr}}</option>
+												@endforeach
+												
 											</select>
 											<select name="pValeurASMR" class="form-select text-green">
 												<option value="%">Valeur ASMR</option>
-												<?php
-												while ($row = $valeurASMR->fetch()) {
-													echo "<option";
-													if ($pValeurASMR == $row['valeurASMR']) echo " selected='selected'";
-													echo ">" . $row['valeurASMR'] . "</option>";
-												}
-												?>
+												@foreach($valeurASMR as $nAsmr)
+												<option @selected(old('pValeurASMR') == $nAsmr)>{{$nAsmr}}</option>
+												@endforeach
 											</select>
 											<select name="pVoieAdmi"  class="form-select text-green">
 												<option value="%">Voie d'administration</option>
-												<?php
-												while ($row = $voieAd->fetch()) {
-													echo "<option";
-													if ($pVoieAdmi == $row['labelVoieAdministration']) echo " selected='selected'";
-													echo ">" . $row['labelVoieAdministration'] . "</option>";
-												}
-												?>
+												@foreach($voieAdministration as $nAd)
+												<option @selected(old('pVoieAdmi') == $nAd)>{{$nAd}}</option>
+												@endforeach
 											</select>
             							</div>
                 						<div class="col-12 col-md-6 d-flex gap-1 flex-column">
             								<select name="pTauxRem" class=" form-select text-green ">
 												<option value="">Taux Remboursement</option>
-												<?php
-												while ($row = $tauxRemboursements->fetch()) {
-													echo "<option";
-													if ($pTauxRem == $row['tauxRemboursement']) echo " selected='selected'";
-													echo ">" . $row['tauxRemboursement'] . "</option>";
-												}
-												?>
+												@foreach($tauxRemboursements as $ntx)
+												<option @selected(old('pTauxRem') == $ntx)>{{$ntx}}</option>
+												@endforeach
 											</select>
             								<select name="pformePharma"  class="form-select text-green">
 												<option value="%">Forme Pharmacie</option>
-												<?php
-												while ($row = $formePharmas->fetch()) {
-													echo "<option";
-													if ($pformePharma == $row['formePharma']) echo " selected='selected'";
-													echo ">" . $row['formePharma'] . "</option>";
-												}
-												?>
+												@foreach($formePharmas as $nfp)
+												<option @selected(old('pformePharma') == $nfp)>{{$nfp}}</option>
+												@endforeach
 											</select>
 											<select name="pSurveillance" class="form-select text-green">
 												<option value="-1"<?php if ($pSurveillance == -1) echo "selected='selected'"; ?>>Surveillance Renforcée</option>

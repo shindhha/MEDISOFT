@@ -6,37 +6,7 @@
 	<div class="container-fluid h-100  text-white">
 		<div class="row h-100">
 			<!-- Menu -->
-			<div id="menu" class="pt-3 menu z-index-dropdown col-md-1 col-4 d-md-flex d-none flex-column gap-3 blue h-100 align-items-center">
-				<span onclick="manageClass('menu','d-none')"class="material-symbols-outlined d-block d-md-none text-end w-100">arrow_back</span>
-				<div class=" green border-1 ratio ratio-1x1">
-
-				</div>
-				<a href="index.php?controller=medicamentslist" class="d-md-none">
-					<div class="text-white green border-1 ratio ratio-1x1">
-						<span class="d-flex display-3 align-items-center justify-content-center material-symbols-outlined">
-							medication
-						</span>
-					</div>
-				</a>
-				<a href="index.php?controller=patientslist" class="d-md-none">
-					<div  class=" text-white green border-1 ratio ratio-1x1">
-						<span class="d-flex display-3 justify-content-center align-items-center material-symbols-outlined">
-							groups
-						</span>
-					</div>
-				</a>
-				<a href="index.php?controller=medicamentslist" class="text-white d-none d-md-block green border-1 ratio ratio-1x1">
-
-                    <span class="d-flex display-3 align-items-center justify-content-center material-symbols-outlined">
-                        medication
-                    </span>
-                </a>
-                <a href="index.php?controller=patientslist" class=" text-white d-none d-md-block green border-1 ratio ratio-1x1">
-                    <span class="d-flex display-3 justify-content-center align-items-center material-symbols-outlined">
-                        groups
-                    </span>
-                </a>
-			</div>
+			@include('includes/sideBar')
 			<!-- Main page -->
 			<div class="col-md-11 h-100 text-center ">
 				<!-- Bandeau outils -->	
@@ -129,13 +99,14 @@
 										<th></th>
 									</tr>
 								</thead>
-								<?php
-								foreach ($visites as $row) {
-								echo "<tr>"
-										 ."<td>" . $row['motifVisite'] . "</td>"
-										 ."<td>" . $row['dateVisite'] . "</td>"
-										 ."<td>" . $row['Description'] . "</td>"
-								?>
+
+								@foreach($visites as $visite)
+
+								<tr>
+										 <td>{{$visite->motifVisite}} </td>
+										 <td> {{$visite->dateVisite}} </td>
+										 <td> {{$visite->Description}}</td>
+
 								<td>
 									<div class="dropdown">
 										<span class="material-symbols-outlined" type="button" id="dropdownMenuButton1" data-bs-auto-close="false" data-bs-toggle="dropdown" aria-expanded="false">
@@ -143,27 +114,22 @@
 										</span>
 										<div class="p-0 text-end dropdown-menu dropdown-menu-end green text-white no-border" aria-labelledby="dropdownMenuButton1">
 											<table class="text-white ">
-												<form action="index.php" action="POST" >
-													<input type="hidden" name="controller" value="patientslist">
-													<input type="hidden" name="action" value="goFicheVisite">
-													<input type="hidden" name="idVisite" value="<?php echo $row['idVisite'] ?>">
-													<tr><input class="btn text-white text-decoration-underline text-end" type="submit" name="modif" value="Afficher"> </tr>
+												<form action="{{route('showVisite',['id' => $visite->idVisite])}}" action="POST" >
+													<tr><input class="btn text-white text-decoration-underline text-end" type="submit" value="Afficher"> </tr>
 												</form>
-												<form action="index.php" action="POST" >
-													<input type="hidden" name="idVisite" value="<?php echo $row['idVisite'] ?>">
-													<tr><a  href="#exampleModal" data-bs-toggle="modal" class="btn text-white text-decoration-underline text-end" name="modif" onclick="add('<?php echo "Visite : " .$row['motifVisite']. " de " . $patient['nom'] . " " . $patient['prenom'] . "','". $row['idVisite']  ?>')">Supprimer</a> </tr>
+												<form action="{{route('deleteVisite',['id' => $visite->idVisite])}}" action="POST" >
+													<tr><a  href="#exampleModal" data-bs-toggle="modal" class="btn text-white text-decoration-underline text-end" name="modif" onclick="add('Visite : {{$visite->motifVisite}} de {{$patient->nom}}  {{$patient->prenom}}','{{$visite->idVisite}} ')">Supprimer</a> </tr>
 												</form>
 											</table>
 										</div>
 									</div>
 								</td>
-								<?php
-									echo "</tr>";
-									}
-								?>
+							</tr>
+								@endforeach
 							</table>
 						</div>
 					</div>
+					
 					<div class="h-25">
 						<div class="d-flex flex-row justify-content-center justify-content-md-end">
 							<div class="d-flex me-2 py-2 px-3 border-1 green">
@@ -186,34 +152,8 @@
 			</div>
 		</div>			
 	</div>
-	<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-		 		<div class="modal-dialog modal-md modal-dialog-centered">
-
-		    		<div class="modal-content ">
-		    			<div class = "h5 col-12 green d-flex text-start p-3 align-middle">
-		    				<span id ="libelle"></span>
-		    			</div>
-		    			<div class="text-center text-danger d-flex flex-column">
-		    				<span>Etes vous sur de vouloir supprimer la visite ?</span>
-		    				<span>Touts ses médicaments seront perdue .</span>
-		    			</div>
-		    			<div class = "d-flex justify-content-end p-3 gap-3">
-		    				<input type="submit" class="green no-border text-white me-2 py-2 px-3 border-1" data-bs-dismiss="modal" value="Annuler">
-		    				<form>		
-		    					<input type="submit" class="green no-border text-white me-2 py-2 px-3 border-1" value="confirmer">
-								<input type="hidden" name="controller" value="patientslist">
-								<input type="hidden" name="action" value="deleteVisite">
-		    					<input type="hidden" name="idVisite" value="" id ="code">
-		    					<input type="hidden" name="idPatient" value="">
-		    				</form>
-
-		    			</div>
-		    			
-		    			
-		    		</div>
-				</div>
-			</div>
-		<script type="text/javascript" src="scripts/script.js"></script>
+	@include('includes/popup')
+		<script type="text/javascript" src="{{asset('t.js')}}"></script>
 		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"></script>
 	</div>
 </body>
