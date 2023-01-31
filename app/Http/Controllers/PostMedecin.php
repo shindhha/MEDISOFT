@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Patient;
+use App\Models\Visite;
 use Illuminate\Http\Request;
 use App\Models\UsersServices;
 use App\Models\settings;
-use App\Models\medecin;
+use App\Models\alter;
 use Illuminate\Support\Facades\DB;
 use PDOException;
 class PostMedecin extends Controller
@@ -18,7 +20,7 @@ class PostMedecin extends Controller
     }
     public function index(Request $request = null) {
 
-        $textInput = $request != null ? explode(" ", $request->search) : "%"; 
+        $textInput = $request != null ? explode(" ", $request->search) : "%";
         $nom = $textInput[0]?: "";
         $prenom = isset($textInput[1]) == true ? $textInput[1] : $textInput[0];
         $medecinTraitant = $request != null ? $request->medecin : "%";
@@ -49,19 +51,19 @@ class PostMedecin extends Controller
         } catch (PDOException $e) {
             DB::rollback();
         }
-        
+
         return $this->index();
-        
+
     }
 
-    
+
 
     public function goFichePatient($id)
     {
 
+        $patient = Patient::find($id);
+        $visites = $patient->visites();
 
-        $visites = $this->usersservices->getVisites($id);
-        $patient = $this->usersservices->getPatient($id);
         $pageSettings = settings::getDefaultConfigMedecin('Fiche Patient');
         $pageSettings->setRoute('deleteVisite');
         $pageSettings->addVariable('idVisite');
@@ -74,13 +76,14 @@ class PostMedecin extends Controller
     {
 
         try {
-            $idPatient = $this->usersservices->insertPatient($request->numSecu,$request->LieuNaissance,$request->nom,$request->prenom,$request->dateNaissance,$request->adresse,$request->codePostal,$request->ville,$request->medecinTraitant,$request->numTel,$request->email,$request->sexe,$request->notes);
-
-            return to_route('showPatient',['id' => $idPatient]);
+            $newPatient = new Patient;
+            $newPatient->fill($request);
+            $newPatient->save();
+            return to_route('showPatient',['id' => $newPatient->id]);
 
         } catch (PDOException $e) {
-           throw new PDOException($e->getMessage(), $e->getCode());
-           
+           dd($e);
+
         }
         $pageSettings = settings::getDefaultConfigMedecin('Edition Patient');
         $medecins = $this->usersservices->getMedecins();
@@ -91,13 +94,13 @@ class PostMedecin extends Controller
     }
 
     public function updatePatient(Request $request,$id)
-    {   
+    {
 
         try {
             $this->usersservices->updatePatient($id,$request->numSecu,$request->LieuNaissance,$request->nom,$request->prenom,$request->dateNaissance,$request->adresse,$request->codePostal,$request->medecinTraitant,$request->numTel,$request->email,$request->sexe,$request->notes);
             return to_route('showPatient',['id' => $id]);
         } catch (PDOException $e) {
-           
+
         }
         $pageSettings = settings::getDefaultConfigMedecin('Edition Patient');
         $medecins = $this->usersservices->getMedecins();
@@ -109,7 +112,7 @@ class PostMedecin extends Controller
     }
 
     public function deleteVisite(Request $request)
-    {   
+    {
         $id = $request->idVisite;
         try {
             DB::beginTransaction();
@@ -120,20 +123,15 @@ class PostMedecin extends Controller
         } catch (PDOException $e) {
             DB::rollback();
         }
-        
+
 
         return to_route('ListMedicament');
     }
 
     public function goEditPatient($id = null,Request $request = null)
     {
-        $patient;
-        if ($id === null) {
-            $patient = new medecin($request);
-        } else {
-            $patient = $this->usersservices->getPatient($id);
-        }
-        
+        $patient = new alter();
+        if ($id != null ) $patient = Patient::find($id);
         $medecins = $this->usersservices->getMedecins();
         $pageSettings = settings::getDefaultConfigMedecin('Fiche Patient');
         return view('editPatient',['patient' => $patient,
@@ -144,14 +142,14 @@ class PostMedecin extends Controller
 
     public function goFicheVisite($id)
     {
+        $visite = Visite::find($id);
+        $drugs = $visite->drugs();
+        $patient = $visite->patient();
 
-        $drugsVisite = $this->usersservices->getOrdonnances($id);
-        $patient = $this->usersservices->getPatientByVisite($id);
-        $visite = $this->usersservices->getVisite($id);
         $pageSettings = settings::getDefaultConfigMedecin('Fiche Visite');
-        
+
         return view('visite',['id' => $id,
-                                  'drugsVisite' => $drugsVisite,
+                                  'drugsVisite' => $drugs,
                                   'patient' => $patient,
                                   'visite' => $visite,
                                   'pageInfos' => $pageSettings->getSettings()]);
@@ -161,7 +159,7 @@ class PostMedecin extends Controller
     {
         $visite;
         if ($id === null) {
-            $visite = new medecin();
+            $visite = new alter();
         } else {
             $visite = $this->usersservices->getVisite($id);
         }
@@ -182,7 +180,7 @@ class PostMedecin extends Controller
 
     public function updateVisite($id,Request $request)
     {
-        
+
         try {
             $this->usersservices->modifVisite($id,$request->motif,$request->Date,$request->Description,$request->Conclusion);
             $view = $this->goFicheVisite($pdo);
@@ -192,7 +190,7 @@ class PostMedecin extends Controller
                 $view->setVar("dateError","Veuillez sélectionner la date.");
             }
         }
-        
+
         return to_route('showVisite');
     }
 
@@ -212,7 +210,7 @@ class PostMedecin extends Controller
     }
 
     public function addMedicament($pdo)
-    {   
+    {
         $codeCIP7 = HttpHelper::getParam("codeCIP7");
         $instruction = HttpHelper::getParam("instruction");
 
@@ -224,7 +222,7 @@ class PostMedecin extends Controller
             $view->setVar("addMedicError","Ce médicament a déjà été ajouté !");
         }
 
-        
+
         return $view;
     }
 

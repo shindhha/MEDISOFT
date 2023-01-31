@@ -9,8 +9,8 @@
 			@include('includes/sideBar')
 			<!-- Main page -->
 			<div class="col-md-11 h-100 text-center ">
-				<!-- Bandeau outils -->	
-				
+				<!-- Bandeau outils -->
+
 				<nav class="  row h-11 navbar navbar-expand-lg navbar-light green">
 					<div class="d-flex px-md-5 container-fluid green">
 						<span class="material-symbols-outlined text-start d-block d-md-none" onclick="manageClass('menu','d-none')">menu</span>
@@ -26,7 +26,7 @@
 						<span></span>
 						<h1><?php echo $patient->nom . " " . $patient->prenom?></h1>
 						<div>
-							<?php 
+							<?php
 							if ($patient->sexe) {
 								echo "<span class='material-symbols-outlined display-3 font-40' >
 										man
@@ -37,7 +37,7 @@
 									</span>";
 							}
 							?>
-							
+
 						</div>
 					</div>
 				</div>
@@ -45,15 +45,15 @@
 				<div class="container-fluid h-100 overflow-scroll overflow-md-none">
 					<div class="col-12 d-flex flex-column flex-md-row px-1 px-md-5 justify-content-between text-dark">
 						<div class="d-flex flex-column col-12 col-xl-5 text-start">
-							
+
 							<div class="h2"> Informations </div>
 							<div class="border-top border-dark pt-3	">
-								
+
 								<div class="d-flex flex-row justify-content-between">
 									<div> Adresse : </div> <div> <?php echo $patient->adresse ?></div>
 								</div>
 								<div class="d-flex flex-row justify-content-between">
-									<div>n°Telephone : </div><?php echo "0".$patient->numTel ?>	
+									<div>n°Telephone : </div><?php echo "0".$patient->numTel ?>
 								</div>
 								<div class="d-flex flex-row justify-content-between">
 									<div>email : </div><?php echo $patient->email?>
@@ -65,16 +65,16 @@
 									<div>Numéro de sécurité sociale : </div><?php echo $patient->numSecu ?>
 								</div>
 								<div class="d-flex flex-row justify-content-between">
-									<div>Date de naissance : </div><?php echo $patient->dateNaissance ?>		
+									<div>Date de naissance : </div><?php echo $patient->dateNaissance ?>
 								</div>
 								<div class="d-flex flex-row justify-content-between">
-									<div>Lieu de naissance : </div><?php echo $patient->LieuNaissance ?>		
+									<div>Lieu de naissance : </div><?php echo $patient->LieuNaissance ?>
 								</div>
 								<div class="d-flex flex-row justify-content-between">
 									<div>CodePostal : </div><?php echo $patient->codePostal ?>
 								</div>
 							</div>
-							
+
 						</div>
 
 						<div class="d-flex flex-column col-xl-3 text-start">
@@ -82,11 +82,11 @@
 							<div class="d-flex align-items-start border border-dark ratio ratio-21x9">
 								<?php echo $patient->notes ?>
 							</div>
-							
+
 						</div>
 					</div>
 					<!-- content -->
-				
+
 					<div class="col-md-12 h-50 justify-content-center">
 						<div class="text-dark text-start h2">Liste des visites</div>
 						<div class="table-responsive h-75 mb-2 w-100">
@@ -129,28 +129,28 @@
 							</table>
 						</div>
 					</div>
-					
+
 					<div class="h-25">
 						<div class="d-flex flex-row justify-content-center justify-content-md-end">
 							<div class="d-flex me-2 py-2 px-3 border-1 green">
 								<form method="post" action="{{route('addVisite')}}">
 									@csrf
-									<input type="hidden" name="idPatient" value="{{$patient->idPatient}}">
+									<input type="hidden" name="idPatient" value="{{$patient->id}}">
 									<input type="submit" class="green no-border text-white" value="Ajouter une visite">
 								</form>
 							</div>
 							<div class="d-flex me-2 py-2 px-3 border-1 green">
-								<form method="post" action="{{route('updatePatient',['id' => $patient->idPatient])}}">
+								<form method="post" action="{{route('updatePatient',['id' => $patient->id])}}">
 									@csrf
 									<input type="submit" class="green no-border text-white" value="Modifier le patient">
 								</form>
 							</div>
 						</div>
 					</div>
-					
+
 				</div>
 			</div>
-		</div>			
+		</div>
 	</div>
 	@include('includes/popup')
 		<script type="text/javascript" src="{{asset('t.js')}}"></script>

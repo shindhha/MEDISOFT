@@ -13,18 +13,16 @@ return new class extends Migration
      */
     public function up()
     {
+        Schema::create('ordonnances', function (Blueprint $table) {
+
+            $table->integer('codeCIP7');
+            $table->text('instruction');
+            $table->primary(['idVisite','codeCIP7']);
 
 
-
-
-        Schema::create('cabinet', function (Blueprint $table) {
-            $table->string('adresse',25);
-            $table->integer('codePostal');
-            $table->string('ville',255);
-            $table->id();
+            $table->unsignedBigInteger('idVisite');
+            $table->foreign('idVisite')->references('idVisite')->on('visites');
         });
-
-
     }
 
     /**
@@ -34,6 +32,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('cabinet');
+        Schema::dropIfExists('ordonnances');
     }
 };

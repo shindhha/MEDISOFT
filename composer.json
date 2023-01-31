@@ -10,7 +10,10 @@
         "laravel/framework": "^9.19",
         "laravel/sanctum": "^3.0",
         "laravel/tinker": "^2.7",
-        "laravel/ui": "^4.2"
+        "laravel/ui": "^4.2",
+      "ext-curl": "*",
+        "ext-pdo": "*",
+        "ext-iconv": "*"
     },
     "require-dev": {
         "fakerphp/faker": "^1.9.1",

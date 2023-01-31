@@ -198,7 +198,7 @@ return new class extends Migration
             $table->foreign('idAutoEur')->references('idAutoEur')->on('autoreurops');
             $table->foreign('idFormePharma')->references('idFormePharma')->on('formepharmas');
             $table->foreign('idStatutAdAMM')->references('idStatutAdAMM')->on('statutadamms');
-            $table->foreign('idTypeProc')->references('idTypeProc')->on('typeprocs'); 
+            $table->foreign('idTypeProc')->references('idTypeProc')->on('typeprocs');
         });
 
         Schema::table('tauxremboursements', function (Blueprint $table) {
@@ -250,7 +250,7 @@ return new class extends Migration
             $table->foreign('idLibelleASMR')->references('idLibelleASMR')->on('libelleasmr');
         });
         DB::statement("CREATE VIEW listMedic as
-            select CIS_BDPM.codeCIS,formePharma,labelVoieAdministration,etatCommercialisation,tauxRemboursement,prix,libellePresentation,surveillanceRenforcee,valeurASMR,libelleNiveauSMR,codeCIP7,designation 
+            select CIS_BDPM.codeCIS,formePharma,labelVoieAdministration,etatCommercialisation,tauxRemboursement,prix,libellePresentation,surveillanceRenforcee,valeurASMR,libelleNiveauSMR,codeCIP7,designation
             from CIS_BDPM
             LEFT JOIN CIS_CIP_BDPM
             ON CIS_BDPM.codeCIS = CIS_CIP_BDPM.codeCIS
@@ -323,6 +323,7 @@ return new class extends Migration
         Schema::dropIfExists('cis_has_smr');
         Schema::dropIfExists('cis_has_asmr');
         Schema::dropIfExists('erreursimportations');
+        Schema::dropIfExists('listMedic');
         DB::statement("DROP VIEW IF EXISTS listMedic");
         Schema::enableForeignKeyConstraints();
     }

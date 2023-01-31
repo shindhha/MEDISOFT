@@ -8,8 +8,8 @@
 			<!-- Menu -->
 			@include('includes/sideBar')
 			<div class="col-md-11 h-100 text-center">
-				<!-- Bandeau outils -->	
-				
+				<!-- Bandeau outils -->
+
 				<nav class="row h-11 navbar navbar-expand-lg navbar-light green">
 					<div class="col-12 d-flex justify-content-center justify-content-md-between px-1 px-md-5 green align-items-center">
 						<div class="d-flex px-md-5 container-fluid green">
@@ -22,7 +22,7 @@
 							<input type="hidden" name="controller" value="patientslist">
 							<div class="d-flex me-2 py-2 px-3 bg-white border-1 col-7 col-md-10 justify-content-end">
 								<input name="search" class="no-border form-control" type="search" placeholder="Nom prenom" value="" onkeyup="showHint(this.value)" aria-label="Search">
-								<input type="submit" class="no-border bg-white material-symbols-outlined text-black" value="search">  
+								<input type="submit" class="no-border bg-white material-symbols-outlined text-black" value="search">
 
 							</div>
 							<!-- Filtre -->
@@ -33,14 +33,14 @@
 								<div class="container-fluid green p-4 z-index-dropdown">
 									<div class="row gap-1 gap-md-0">
 										<div class="col-12 col-md-6 d-flex gap-1 flex-column">
-											<input type="date" class="form-control" name="dateMin">	
+											<input type="date" class="form-control" name="dateMin">
 											<input type="date" class="form-control" name="dateMax">
 										</div>
 										<div class="col-12 col-md-6 d-flex gap-1 flex-column">
 											<select name="medecin" class="form-select text-green">
 												<option value="%">MEDECIN</option>
 												@foreach($medecins as $medecin)
-												<option  value="{{$medecin->idMedecin}}" @selected(old('medecin') == $medecin)>{{$medecin->nom . ' ' . $medecin->prenom}}</option>
+												<option  value="{{$medecin->idMedecin}}" @selected(old('alter') == $medecin)>{{$medecin->nom . ' ' . $medecin->prenom}}</option>
 												@endforeach
 											</select>
 											<select name="pValeurASMR" class="form-select text-green">
@@ -69,6 +69,7 @@
 					</div>
 					<div class="d-flex h-75 align-items-center justify-content-center">
 						<div class="table-responsive h-75 border border-success align-middle">
+
 							<table class="table table-striped lightGreen">
 								<thead class="sticky-top bg-white text-dark  ">
 									<tr>
@@ -82,7 +83,7 @@
 										<th></th>
 									</tr>
 								</thead>
-								@foreach ($patients as $patient) 
+								@foreach ($patients as $patient)
 								<tr>
 									<td> {{$patient->numSecu}} </td>
 									<td> {{$patient->nom}} </td>
@@ -90,8 +91,8 @@
 									<td> {{$patient->dateNaissance}} </td>
 									<td> 0{{$patient->numTel}} </td>
 									<td>  {{$patient->adresse}} </td>
-									
-									
+
+
 									<td>
 										<div class="dropdown  ">
 											<span class=" material-symbols-outlined" type="button" id="dropdownMenuButton1" data-bs-auto-close="false" data-bs-toggle="dropdown" aria-expanded="false">
@@ -100,14 +101,13 @@
 											<div class="p-0 border-2 dropdown-menu green dropdown-menu-end text-white no-border" aria-labelledby="dropdownMenuButton1">
 												<div class="d-flex flex-column green">
 													<table class="text-white ">
-														<form action="{{route('showPatient',['id' => $patient->idPatient])}}" action="POST" class="d-flex flex-column green">
+
+														<form action="{{route('showPatient',['id' => $patient->id])}}" action="POST" class="d-flex flex-column green">
 															@csrf
 															<tr><input type="submit" class="btn text-white text-decoration-underline text-end" value="Afficher"> </tr>
 														</form>
-														<form action="index.php" action="POST" class="d-flex flex-column green">
-															<input type="hidden" name="idPatient" value="{{$patient->idPatient}}">
-															<a  href="#exampleModal" class="btn text-white text-decoration-underline text-end" data-bs-toggle="modal" class="btn green" onclick="add('{{$patient->nom}}  {{$patient->prenom}}','{{$patient->idPatient}}')">Supprimer</a>
-														</form>
+
+															<a  href="#exampleModal" class="btn text-white text-decoration-underline text-end" data-bs-toggle="modal" class="btn green" onclick="add('{{$patient->nom}}  {{$patient->prenom}}','{{$patient->id}}')">Supprimer</a>
 													</table>
 												</div>
 											</div>
@@ -115,7 +115,7 @@
 
 									</td>
 								</tr>
-								@endforeach	
+								@endforeach
 							</table>
 						</div>
 					</div>
@@ -133,7 +133,7 @@
 
 			@include('includes/popup')
 
-			
+
 
 		</div>
 

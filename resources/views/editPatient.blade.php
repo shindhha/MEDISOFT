@@ -8,8 +8,8 @@
 			@include('includes/sideBar')
 			<!-- Main page -->
 			<div class="col-md-11 h-75 text-center">
-				<!-- Bandeau outils -->	
-				
+				<!-- Bandeau outils -->
+
 				@include('includes/navbar')
 				<!-- Bandeau Patient -->
 				<form method="post" action="/editPatient/{{$id}}">
@@ -21,12 +21,12 @@
 								<div class="d-flex flex-column text-start">
 										<span class="" >Nom</span>
 										<div class="d-flex ">
-											<input class="form-control " type="text" name="nom" value="{{$patient->nom}}"> 
+											<input class="form-control " type="text" name="nom" value="{{$patient->nom}}">
 										</div>
 										<span class="" >Prenom</span>
 										<div><input class="form-control" type="text" name="prenom" value="{{$patient->prenom}}"> </div>
 										<span class="" >Adresse</span>
-										<div><input class="form-control" type="text" name="adresse" value="{{$patient->adresse}}"> 
+										<div><input class="form-control" type="text" name="adresse" value="{{$patient->adresse}}">
 										</div>
 										<span class="" >Code Postal</span>
 										<div>
@@ -48,7 +48,7 @@
 										<select name="medecinTraitant" class="form-select">
 											<option value="0">Medecin Traitant</option>
 											@foreach($medecins as $medecin)
-												<option  value="{{$medecin->idMedecin}}" @selected(old('medecin') == $medecin)>{{$medecin->nom . ' ' . $medecin->prenom}}</option>
+												<option  value="{{$medecin->idMedecin}}" @selected(old('alter') == $medecin)>{{$medecin->nom . ' ' . $medecin->prenom}}</option>
 											@endforeach
 										</select>
 										<span >Sexe</span>
@@ -80,20 +80,20 @@
 
 					<div class="d-flex justify-content-center">
 						<div class="d-flex col-12 col-md-10 text-start mb-2 flex-column text-green">
-							<h1>Notes</h1> 
+							<h1>Notes</h1>
 							<textarea  name="notes" rows="12" cols="33">{{$patient->notes}}</textarea>
 						</div>
 					</div>
 
 						<!-- Portail de connexion -->
 					<div class="d-flex justify-content-end justify-content-md-center">
-						<div class="d-flex col-md-10 flex-row justify-content-between">	
+						<div class="d-flex col-md-10 flex-row justify-content-between">
 							<div class="d-flex me-2 py-2 px-3 border-1 bg-danger">
-								<input type="submit" class="bg-danger no-border text-white" value="Annuler" onclick="goTo('index','patientslist')">	
+								<input type="submit" class="bg-danger no-border text-white" value="Annuler" onclick="goTo('index','patientslist')">
 							</div>
 							<div class="d-flex me-2 py-2 px-3 border-1 green">
 
-								<input type="submit" class="green no-border text-white" value="Valider">		
+								<input type="submit" class="green no-border text-white" value="Valider">
 							</div>
 						</div>
 

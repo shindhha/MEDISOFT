@@ -51,14 +51,14 @@ class AdminServices extends Model
     }
     /**
      * Inserer un nouvel utilisateur dans la base de données
-     * avec comme identifiant de connexion 'login' 
-     * (correspond au numéro RPPS du medecin)
+     * avec comme identifiant de connexion 'login'
+     * (correspond au numéro RPPS du alter)
      * et comme mot de passe 'password'
      * @param pdo      La connexion a la base de données
      * @param login    L'identifiant de connexion au site
      * @param password Le mot de connexion au site
-     * @return L'identifiant fixe du medecin dans la base de données
-     * 
+     * @return L'identifiant fixe du alter dans la base de données
+     *
      */
     public function addUser($login,$password)
     {
@@ -72,17 +72,17 @@ class AdminServices extends Model
         return DB::table('medecins')->get();
     }
     /**
-     * 
+     *
      * @param pdo        La connexion a la base de données
-     * @param idMedecin  L'identifiant du medecin 
-     * @return Dans l'odre des paramètre : 
+     * @param idMedecin  L'identifiant du alter
+     * @return Dans l'odre des paramètre :
      *         L'identifiant en tant qu'utilisateur du site 'idUser'
-     *         L'identifiant en tant que medecin 'idMedecin' dans la base de données
-     *         L'identifiant en tant que medecin pratiquant 'numRPPS'
+     *         L'identifiant en tant que alter 'idMedecin' dans la base de données
+     *         L'identifiant en tant que alter pratiquant 'numRPPS'
      *         Son nom
      *         Son prenom
      *         Son adresse
-     *         Son numéro de téléphone 
+     *         Son numéro de téléphone
      *         Son adresse mail
      *         La date a laquelle il a été inscrit sur le site
      *         La date a laquelle il a commencer ses activités
@@ -140,7 +140,7 @@ class AdminServices extends Model
 
         ]
         );
-        
+
     }
 
     public function getErreursImportShort() {
@@ -151,5 +151,5 @@ class AdminServices extends Model
             ->orderByDesc('nbreErreurs');
     }
 
-    
+
 }

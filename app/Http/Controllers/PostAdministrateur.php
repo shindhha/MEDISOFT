@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Medecin1;
 use Illuminate\Http\Request;
 use App\Models\AdminServices;
 use Illuminate\Support\Facades\DB;
 use App\Models\settings;
-use App\Models\medecin;
+use App\Models\alter;
 use PDOException;
+use App\Models\ImportServices;
 class PostAdministrateur extends Controller
 {
     private $importservice;
@@ -26,6 +28,7 @@ class PostAdministrateur extends Controller
     function __construct()
     {
         $this->adminServices = AdminServices::getDefaultAdminServices();
+        $this->importservice = ImportServices::getDefaultImportService();
     }
     public function index() {
         $cabinet = $this->adminServices->getInformationCabinet();
@@ -40,26 +43,22 @@ class PostAdministrateur extends Controller
     }
 
 
-    public function importAll($pdo) {
-        $view = new View("Sae3.3CabinetMedical/views/administrateur");
-        $this->importservice->prepareImport($pdo);
+    public function importAll() {
+        $this->importservice->prepareImport(DB::connection()->getPdo());
         foreach ($this->files as $file) {
             $filep = $file[0];
             $function = $file[1];
             $nbParam = $file[2];
-            $trimLine = $file[3];
-            $iCis = $file[4];
-            $bd = $file[5];
             $this->importservice->download($filep);
             try {
-                $importStmt = $this->importservice->constructSQL($pdo,$nbParam,$function,true);
-                $updateStmt = $this->importservice->constructSQL($pdo,$nbParam,$function,false);
-                $test = $this->importservice->exportToBD($pdo,$importStmt,$updateStmt,$file);
+                $importStmt = $this->importservice->constructSQL($nbParam,$function,true);
+                $updateStmt = $this->importservice->constructSQL($nbParam,$function,false);
+                $this->importservice->exportToBD($importStmt,$updateStmt,$file);
             } catch (PDOException $e) {
                 echo $e->getMessage() . " " . $e->getCode() . " " . $e->getLine() . "<br><br>";
             }
         }
-        return $view;
+        return to_route('erreursImport');
     }
 
     public function deleteMedecin(Request $request)
@@ -72,10 +71,10 @@ class PostAdministrateur extends Controller
             DB::commit();
         } catch (PDOException $e) {
             throw new Exception("Error Processing Request", 1);
-            
+
             DB::rollback();
         }
-        
+
         return to_route('doctorList');
     }
 
@@ -90,12 +89,12 @@ class PostAdministrateur extends Controller
     {
         $medecin;
         if ($id === null) {
-            $medecin = new medecin($request);
+            $medecin = new alter($request);
         } else {
             $medecin = $this->adminServices->getMedecin($id);
         }
         $pageSettings = settings::getDefaultConfigAdministrateur('Edition Medecin');
-        return view('editDoctor',['medecin' => $medecin , 
+        return view('editDoctor',['alter' => $medecin ,
                                   'pageInfos' => $pageSettings->getSettings()]);
     }
 
@@ -103,10 +102,10 @@ class PostAdministrateur extends Controller
     {
 
         $this->lastDoctor = $id;
-        $medecin = $this->adminServices->getMedecin($id);
+        $medecin = Medecin1::find($id);
         $_SESSION['idUserMedecin'] = $medecin->idUser;
         $pageSettings = settings::getDefaultConfigAdministrateur('Fiche Medecin');
-        return view('DoctorSheet',['id' => $this->lastDoctor,'medecin' => $medecin,'pageInfos' => $pageSettings->getSettings()]);
+        return view('DoctorSheet',['id' => $this->lastDoctor,'alter' => $medecin,'pageInfos' => $pageSettings->getSettings()]);
     }
 
     public function goErreursImport()
@@ -114,8 +113,8 @@ class PostAdministrateur extends Controller
         $pageSettings = settings::getDefaultConfigAdministrateur('Erreurs Importations');
         $pageSettings->addIconToNavBar('/importAll','download');
         $erreursImport = $this->adminServices->getErreursImportShort();
-        
-        
+
+
         return view('importErrors',['erreursImport' => $erreursImport,'pageInfos' => $pageSettings->getSettings()]);
     }
 
@@ -183,7 +182,7 @@ class PostAdministrateur extends Controller
                 $request->dateDebutActivite
             );
             DB::commit();
-            
+
             return to_route('show',['id' => $idMedecin]);
         } catch (PDOException $e) {
             DB::rollback();
@@ -200,12 +199,12 @@ class PostAdministrateur extends Controller
             if ($e->getCode() == "2") {
                 $Errors['date'] = ($e->getMessage());
             }
-            
+
         }
 
         $pageSettings = settings::getDefaultConfigAdministrateur('Edition Medecin');
-        
-        return view('editDoctor',['medecin' => $request,'pageInfos' => $pageSettings->getSettings(),'id' => '']);
+
+        return view('editDoctor',['alter' => $request,'pageInfos' => $pageSettings->getSettings(),'id' => '']);
 
     }
 }

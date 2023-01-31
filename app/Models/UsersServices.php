@@ -25,20 +25,20 @@ class UsersServices extends Model
 	}
 
 
-	
+
 	/**
      * données correspond a '@patientID'
      * Met à jour les données d'un patient dont l'identifiant dans la base de
      * @param pdo            La connexion a la base de données
      * @param patientID      Identifiant du patient dans la base de données
      * @param numSecu        Numéro de sécurité sociale du patient sans sa clé de vérification (13 chiffre)
-     * @param LieuNaissance  Lieu de naissance du patient 
+     * @param LieuNaissance  Lieu de naissance du patient
      * @param nom            Nom du patient
      * @param prenom         Prenom du patient
-     * @param dateNaissance  Date de naissance du patient 
-     * @param adresse        Adresse du patient 
+     * @param dateNaissance  Date de naissance du patient
+     * @param adresse        Adresse du patient
      * @param codePostal     Code Postal du patient (entre 01001 et 98800)
-     * @param medecinRef     Le numéro RPPS du Medecin Traitant du patient 
+     * @param medecinRef     Le numéro RPPS du Medecin Traitant du patient
      * @param numTel         Numéro de téléphone du patient (entre 100000000 et 999999999)
      * @param email          Email du patient (de la forme %@%.%)
      * @param sexe           Sexe du patient (0 => Femme ou 1 => Homme)
@@ -65,15 +65,15 @@ class UsersServices extends Model
 
 	}
   /**
-   * Modifie les instruction d'un medicament avec l'identifiant 'codeCIS' 
+   * Modifie les instruction d'un medicament avec l'identifiant 'codeCIS'
    * pour l'ordonnance avec le numéro d'identification 'idVisite'
-   * 
+   *
    * @param pdo         La connexion a la base de données
    * @param idVisite    Identifiant de la visite dans la base de données
    *                    (L'identifiant d'une ordonnance est le meme que pour
-   *                     celui de la visite associer) 
-   * @param codeCIS     Identifiant du medicament 
-   * @param instruction Nouvlles intructions du medecin pour se medicament dans cette visite
+   *                     celui de la visite associer)
+   * @param codeCIS     Identifiant du medicament
+   * @param instruction Nouvlles intructions du alter pour se medicament dans cette visite
    */
   public function editInstruction($idVisite,$codeCIP7,$instruction)
   {
@@ -90,8 +90,8 @@ class UsersServices extends Model
   	return DB::table('medecins')->get();
   }
   /**
-   * Supprime le medicament avec l'identifiant 'codeCIS' 
-   * de l'ordonnance avec l'identifiant 'idVisite' 
+   * Supprime le medicament avec l'identifiant 'codeCIS'
+   * de l'ordonnance avec l'identifiant 'idVisite'
    * @param pdo      La connexion a la base de données
    * @param idVisite L'identifiant de la viste dans la base de données
    * @param codeCIS  L'identifiant du medicament
@@ -103,7 +103,7 @@ class UsersServices extends Model
   	                        ->delete();
   }
   /**
-   * Supprime toute les occurences du patient avec l'identifiant 
+   * Supprime toute les occurences du patient avec l'identifiant
    * 'idPatient' dans la table 'table'
    * @param pdo   La connexion a la base de données
    * @param table La table dans laquelle supprimer le patient
@@ -118,11 +118,11 @@ class UsersServices extends Model
    * et retourne sont identifiant
    * @param pdo            La connexion a la base de données
    * @param numSecu        Numéro de sécurité sociale du patient sans sa clé de vérification (13 chiffre)
-   * @param LieuNaissance  Lieu de naissance du patient 
+   * @param LieuNaissance  Lieu de naissance du patient
    * @param nom            Nom du patient
    * @param prenom         Prenom du patient
-   * @param dateNaissance  Date de naissance du patient 
-   * @param adresse        Adresse du patient 
+   * @param dateNaissance  Date de naissance du patient
+   * @param adresse        Adresse du patient
    * @param codePostal     Code Postal du patient (entre 01001 et 98800)
    * @param medecinRef     Le numéro RPPS du Medecin Traitant du patient (11 chiffre)
    * @param numTel         Numéro de téléphone du patient (entre 100000000 et 999999999)
@@ -155,13 +155,13 @@ class UsersServices extends Model
 
   /**
    * Modifie les informations de la visite avec le numéro d'identification 'idVisite'
-   * 
+   *
    * @param pdo La connexion a la base de données
    * @param idVisite L'identifiant de la visite dans la base de données
    * @param motifVisite La raison de la consultation du patient
    * @param dateVisite  La date a laquelle la visite a été faite
    * @param Description Description du déroulement de la consultation
-   * @param Conclusion  Le traitement que prescrit le médecin au patient 
+   * @param Conclusion  Le traitement que prescrit le médecin au patient
    */
   public function modifVisite($idVisite,$motifVisite,$dateVisite,$Description,$Conclusion)
   {
@@ -174,10 +174,10 @@ class UsersServices extends Model
 
 
   /**
-   * Supprime toute les occurences de la visite avec l'identifiant 
+   * Supprime toute les occurences de la visite avec l'identifiant
    * 'idVisite' dans la table 'table'
    * @param table     La table dans laquelle supprimer le patient
-   * @param idVisite  L'identifiant de la visite 
+   * @param idVisite  L'identifiant de la visite
    */
   public function deleteVisiteFrom($table,$idVisite)
   {
@@ -191,7 +191,7 @@ class UsersServices extends Model
    * @param motifVisite    La raison de la consultation du patient
    * @param dateVisite     La date a laquelle la visite a été faite
    * @param Description    Description du déroulement de la consultation
-   * @param Conclusion     Le traitement que prescrit le médecin au patient 
+   * @param Conclusion     Le traitement que prescrit le médecin au patient
    * @return L'identifiant de la visite venant d'être insérer
    */
   public function insertVisite($idPatient,$motifVisite,$dateVisite,$Description,$Conclusion)
@@ -204,7 +204,7 @@ class UsersServices extends Model
   	DB::table('listevisites')->insert(['idPatient' => $idPatient,
                                        'idVisite' => $lastInsertId,
                                        'idMedecin' => 1]);
-	
+
 	return $lastInsertId;
   }
   /**
@@ -212,7 +212,7 @@ class UsersServices extends Model
    * @param idVisite Identifiant de l'ordonnance dans la base de données
    *                 (L'identifiant d'une ordonnance est le meme que pour
    *                  celui de la visite associer)
-   * @return La designation , la presentation , et les instruction du medecin associer
+   * @return La designation , la presentation , et les instruction du alter associer
    *         precedement ajouter a l'ordonnance.
    */
   public function getOrdonnances($idVisite)
@@ -238,55 +238,14 @@ class UsersServices extends Model
   	->where('idPatient',$idPatient)
   	->get();
   }
-  public function getPatientByVisite($idVisite)
-  {
-  	return DB::table('listevisites')->join('patients','listevisites.idPatient','=','patients.idPatient')
-  	                                ->where('idVisite',$idVisite)->first();
-  }
 
-  /**
-   * Retourne les informations de la visite avec l'identifiant
-   * 'idVisite'
-   * @param pdo La connexion à la base de données
-   * @param idVisite Identifiant de la visite dans la base de données
-   * @return Le motif de la visite , la date a laquelle elle a été réaliser
-   *         La description du déroulement de la consultation
-   *         Le traitement que prescrit le médecin au patient 
-   */
-  public function getVisite($idVisite)
-  {
-  	return Db::table('visites')->where('idVisite',$idVisite)
-  	                    ->first();
-  }
-  /**
-   * Retourne les information du patient avec l'identifiant 'idPatient'
-   * @param pdo La connexion à la base de données
-   * @param idPatient Identifiant du patient dans la base de données
-   * @return Numéro de sécurité sociale du patient sans sa clé de vérification (13 chiffre)
-   *         Lieu de naissance du patient 
-   *         Nom du patient
-   *         Prenom du patient
-   *         Date de naissance du patient 
-   *         Adresse du patient 
-   *         Code Postal du patient (entre 01001 et 98800)
-   *         Le numéro RPPS du Medecin Traitant du patient (11 chiffre)
-   *         Numéro de téléphone du patient (entre 100000000 et 999999999)
-   *         Email du patient (de la forme %@%.%)
-   *         Sexe du patient (0 => Femme ou 1 => Homme)
-   *         Notes relatives au patient
-   * 
-   */
-  public function getPatient($idPatient)
-  {
-  	return DB::table('patients')->where('idPatient',$idPatient)->first();
-  }
 
-  
+
 
   public function getAllSMR($pdo, $codeCIP)
   {
 	$sql = "
-	SELECT dateAvis, libelleNiveauSMR, libelleSmr, lienPage, libelleMotifEval 
+	SELECT dateAvis, libelleNiveauSMR, libelleSmr, lienPage, libelleMotifEval
 	FROM CIS_HAS_SMR
 	JOIN LibelleSmr LS on CIS_HAS_SMR.idLibelleSmr = LS.idLibelleSMR
 	LEFT JOIN HAS_LiensPageCT HLPCT on CIS_HAS_SMR.codeHAS = HLPCT.codeHAS
@@ -327,23 +286,23 @@ class UsersServices extends Model
    *                   Nom    Prenom
    * Ex :   Le patient Dupont Moretti est stocker dans la base de données
    * Si les information fournit : prenom = Dupont et nom = Moretti
-   * Alors le patient sera tout de même retourner 
+   * Alors le patient sera tout de même retourner
    * Cela permet d'eviter certaine potentielles erreur de saisi
    * @param pdo             La connexion a la base de données
    * @param nom             Le nom du patient rechercher
    * @param prenom          Le prenom du patient rechercher
-   * @param medecinTraitant Le medecin traitant du patient rechercher
-   *                        Le medecin doit faire partie du cabinet
-   * 
-   * @return L'identifiant des patients             
+   * @param medecinTraitant Le alter traitant du patient rechercher
+   *                        Le alter doit faire partie du cabinet
+   *
+   * @return L'identifiant des patients
    *         Leurs numéro de sécurités sociales
    *         Leurs lieu de naissances
    *         Leurs nom , prenom                    qui répondent aux critères
    *         Leurs date de Naissance
-   *         Leurs medecin traitant
+   *         Leurs alter traitant
    *         Leurs numéro de téléphone
-   *         Leurs adresse 
-   */  
+   *         Leurs adresse
+   */
 	public function getListPatients($medecinTraitant,$nom,$prenom)
 	{
 
@@ -355,10 +314,10 @@ class UsersServices extends Model
 
 
 	}
-	
+
   /**
    * Ajoute le medicament avec l'identifiant 'codeCIS' avec
-   * les 'instruction' ajouter par le medecin à la visite avec 
+   * les 'instruction' ajouter par le alter à la visite avec
    * l'identifiant 'idVisite'
    * @param pdo         La connexion a la base de données
    * @param idVisite    L'identifiant de la visite
@@ -375,7 +334,7 @@ class UsersServices extends Model
 
 
   /**
-   * Fonctions utiliser principalement pour remplir des 
+   * Fonctions utiliser principalement pour remplir des
    * listes déroulante pour les différents filtres
    * @param pdo    La connexion a la base de données
    * @param param  La colonne cibler dans la table
@@ -401,7 +360,7 @@ class UsersServices extends Model
 		FROM Medecins
 		WHERE numRPPS = :numRPPS";
 		$stmt_medecin = $pdo->prepare($sql_medecin);
-		$stmt_medecin->execute(array("numRPPS" => $_SESSION['currentMedecin'])); 
+		$stmt_medecin->execute(array("numRPPS" => $_SESSION['currentMedecin']));
 
 		$medecin = $stmt_medecin->fetch();
 

@@ -13,18 +13,13 @@ return new class extends Migration
      */
     public function up()
     {
-
-
-
-
-        Schema::create('cabinet', function (Blueprint $table) {
-            $table->string('adresse',25);
-            $table->integer('codePostal');
-            $table->string('ville',255);
-            $table->id();
+        Schema::create('visites', function (Blueprint $table) {
+            $table->id('idVisite');
+            $table->text('motifVisite');
+            $table->text('Description');
+            $table->text('Conclusion');
+            $table->date('dateVisite');
         });
-
-
     }
 
     /**
@@ -34,6 +29,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('cabinet');
+        Schema::dropIfExists('visites');
     }
 };

@@ -16,10 +16,9 @@
 				<div class="row h-100 align-items-center text-center">
 
 					<div class="container ">
-						
+
 						<div class="row justify-content-center">
 							<div class="col-md-8 col-xl-6 col-sm-7 col-12 green border-2 p-5">
-
 								<form method="post" class="d-flex flex-column gap-3">
 									@csrf
 									<span class="fs-1"> Connexion à <u>{{ config('app.name')}}</u> </span>
@@ -38,7 +37,7 @@
 			</div>
 
 		</div>
-		
+
 	</div>
 </body>
 </html>

@@ -13,18 +13,11 @@ return new class extends Migration
      */
     public function up()
     {
-
-
-
-
-        Schema::create('cabinet', function (Blueprint $table) {
-            $table->string('adresse',25);
-            $table->integer('codePostal');
-            $table->string('ville',255);
+        Schema::create('users', function (Blueprint $table) {
             $table->id();
+            $table->string('login',11)->unique();
+            $table->char('password',32);
         });
-
-
     }
 
     /**
@@ -34,6 +27,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('cabinet');
+        Schema::dropIfExists('users');
     }
 };

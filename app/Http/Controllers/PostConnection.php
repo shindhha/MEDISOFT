@@ -22,7 +22,7 @@ class PostConnection extends Controller
             if ($request->login == "admin") {
                 return to_route('administrateur');
             } else {
-                return to_route('medecin');
+                return to_route('alter');
             }
         }
 
@@ -32,5 +32,5 @@ class PostConnection extends Controller
         return view('connection',['pageInfos' => $pageSettings->getSettings()]);
     }
 
-    
+
 }

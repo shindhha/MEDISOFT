@@ -47,7 +47,8 @@ Route::any('/VisiteSheet/{id}',[\App\Http\Controllers\PostMedecin::class,'goFich
 Route::any('/listMedic',[\App\Http\Controllers\PostMedicament::class,'index'])->name('ListMedicament');
 Route::match(['get','post'],'/',[\App\Http\Controllers\PostConnection::class,'index']);
 Route::match(['get','post'],'/cabinet',[\App\Http\Controllers\PostAdministrateur::class,'index'])->name('administrateur');
-Route::match(['get','post'],'/listPatient',[\App\Http\Controllers\PostMedecin::class,'index'])->name('medecin');
+Route::match(['get','post'],'/listPatient',[\App\Http\Controllers\PostMedecin::class,'index'])->name('alter');
 Route::put('/cabinet',[\App\Http\Controllers\PostAdministrateur::class,'updateOrCreateCabinet']);
 Route::match(['get','post'],'/listMedecin',[\App\Http\Controllers\PostAdministrateur::class,'goListMedecins'])->name('doctorList');
-Route::match(['get','post'],'/erreursimport',[\App\Http\Controllers\PostAdministrateur::class,'goErreursImport']);
+Route::match(['get','post'],'/erreursimport',[\App\Http\Controllers\PostAdministrateur::class,'goErreursImport'])->name('erreursImport');
+Route::post('/importAll',[\App\Http\Controllers\PostAdministrateur::class, 'importAll'])->name('importAll');
