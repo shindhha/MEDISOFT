@@ -10,6 +10,7 @@ use App\Models\settings;
 use App\Models\alter;
 use Illuminate\Support\Facades\DB;
 use PDOException;
+use Exception;
 class PostMedecin extends Controller
 {
     private $usersservices;
@@ -58,14 +59,14 @@ class PostMedecin extends Controller
 
 
 
-    public function goFichePatient($id)
+    public function showPatient($id)
     {
 
         $patient = Patient::find($id);
         $visites = $patient->visites();
 
         $pageSettings = settings::getDefaultConfigMedecin('Fiche Patient');
-        $pageSettings->setRoute('deleteVisite');
+        $pageSettings->setRoute('deleteVisit');
         $pageSettings->addVariable('idVisite');
         $pageSettings->addText('Etes vous sur de vouloir supprimer la visite ?');
         $pageSettings->addText('Touts ses médicaments seront perdue .');
@@ -76,14 +77,16 @@ class PostMedecin extends Controller
     {
 
         try {
+            $request->validate([
+                'numSecu' => 'required|min:11|max:11|numeric'
+            ]);
             $newPatient = new Patient;
             $newPatient->fill($request);
             $newPatient->save();
             return to_route('showPatient',['id' => $newPatient->id]);
 
-        } catch (PDOException $e) {
-           dd($e);
-
+        } catch (Exception $e) {
+            return redirect()->back()->withInput();
         }
         $pageSettings = settings::getDefaultConfigMedecin('Edition Patient');
         $medecins = $this->usersservices->getMedecins();
@@ -131,7 +134,9 @@ class PostMedecin extends Controller
     public function goEditPatient($id = null,Request $request = null)
     {
         $patient = new alter();
-        if ($id != null ) $patient = Patient::find($id);
+        if ($id != null ) {
+            $patient = Patient::find($id);
+        }
         $medecins = $this->usersservices->getMedecins();
         $pageSettings = settings::getDefaultConfigMedecin('Fiche Patient');
         return view('editPatient',['patient' => $patient,

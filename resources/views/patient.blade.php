@@ -114,10 +114,10 @@
 										</span>
 										<div class="p-0 text-end dropdown-menu dropdown-menu-end green text-white no-border" aria-labelledby="dropdownMenuButton1">
 											<table class="text-white ">
-												<form action="{{route('showVisite',['id' => $visite->idVisite])}}" action="POST" >
+												<form action="{{route('showVisit',['id' => $visite->idVisite])}}" action="POST" >
 													<tr><input class="btn text-white text-decoration-underline text-end" type="submit" value="Afficher"> </tr>
 												</form>
-												<form action="{{route('deleteVisite',['id' => $visite->idVisite])}}" action="POST" >
+												<form action="{{route('deleteVisit',['id' => $visite->idVisite])}}" action="POST" >
 													<tr><a  href="#exampleModal" data-bs-toggle="modal" class="btn text-white text-decoration-underline text-end" name="modif" onclick="add('Visite : {{$visite->motifVisite}} de {{$patient->nom}}  {{$patient->prenom}}','{{$visite->idVisite}} ')">Supprimer</a> </tr>
 												</form>
 											</table>
@@ -133,7 +133,7 @@
 					<div class="h-25">
 						<div class="d-flex flex-row justify-content-center justify-content-md-end">
 							<div class="d-flex me-2 py-2 px-3 border-1 green">
-								<form method="post" action="{{route('addVisite')}}">
+								<form method="post" action="{{route('editVisit')}}">
 									@csrf
 									<input type="hidden" name="idPatient" value="{{$patient->id}}">
 									<input type="submit" class="green no-border text-white" value="Ajouter une visite">

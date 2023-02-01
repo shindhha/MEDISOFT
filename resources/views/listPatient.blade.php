@@ -121,7 +121,7 @@
 					</div>
 					<div class="d-flex flex-row justify-content-end">
 						<div class="d-flex me-2 py-2 px-3 border-1 green">
-							<form method="post" action="{{route('addPatient')}}">
+							<form method="post" action="{{route('editPatient')}}">
 								@csrf
 								<input type="submit" class="green no-border text-white" value="Ajouter un patient">
 							</form>

@@ -20,9 +20,9 @@ class PostConnection extends Controller
 
         if ($nbUsers) {
             if ($request->login == "admin") {
-                return to_route('administrateur');
+                return to_route('showCabinet');
             } else {
-                return to_route('alter');
+                return to_route('showPatients');
             }
         }
 

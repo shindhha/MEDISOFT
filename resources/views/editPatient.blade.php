@@ -12,9 +12,10 @@
 
 				@include('includes/navbar')
 				<!-- Bandeau Patient -->
-				<form method="post" action="/editPatient/{{$id}}">
-					@method('PUT')
+				<form method="post" action="{{route('')}}">
+
                     @csrf
+                    @method('PUT')
 					<div class="d-flex justify-content-center ">
 						<div class="d-flex flex-column col-12 col-md-8">
 							<div class="d-flex flex-row  justify-content-around text-green">
@@ -58,7 +59,7 @@
 										</select>
 										<span >Numéro sécurité sociale</span>
 										<div>
-											<?php if (isset($numSecuError)) echo $numSecuError; ?>
+
 											<input class="form-control" type="text" name="numSecu" value="{{$patient->numSecu}}">
 										</div>
 										<span >Date Naissance</span>
