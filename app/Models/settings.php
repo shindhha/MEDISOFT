@@ -17,7 +17,7 @@ class settings extends Model
         $pageSettings = new settings();
         $pageSettings->setTitle($name);
         $pageSettings->addIconToSideBar('/listMedic','medication');
-        $pageSettings->addIconToSideBar('/listPatient','groups');
+        $pageSettings->addIconToSideBar('/patients','groups');
         return $pageSettings;
     }
     public static function getDefaultConfigAdministrateur($name)
@@ -47,6 +47,10 @@ class settings extends Model
         $settings['navBarContents'] = $this->navBarSettings;
         $settings['popUpSettings'] = $this->popUpSettings;
         return $settings;
+    }
+
+    public function popUpTarget($name) {
+        $this->popUpSettings['variable'] = $name;
     }
     public function addIconToSideBar($link,$icone)
     {

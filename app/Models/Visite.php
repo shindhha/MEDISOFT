@@ -9,11 +9,16 @@ class Visite extends Model
 {
     use HasFactory;
 
+
     public function patient() {
-        return $this->belongsTo(Patient::class);
+        return $this->belongsTo(Patient::class,'patient_id','id');
     }
 
     public function drugs() {
         return $this->hasMany(Ordonnance::class);
     }
+    protected $table = 'visites';
+    public $incrementing = true;
+    protected $guarded = [];
+    public $timestamps = false;
 }

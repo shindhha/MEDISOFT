@@ -12,4 +12,12 @@ class Patient extends Model
     public function visites() {
         return $this->hasMany(Visite::class);
     }
+    public function medicines()
+    {
+        return $this->hasManyThrough(Ordonnance::class, Visite::class);
+    }
+    protected $table = 'patients';
+    protected $guarded = [];
+    public $timestamps = false;
+    public $incrementing = true;
 }

@@ -14,11 +14,16 @@ return new class extends Migration
     public function up()
     {
         Schema::create('visites', function (Blueprint $table) {
-            $table->id('idVisite');
+            $table->id();
             $table->text('motifVisite');
             $table->text('Description');
             $table->text('Conclusion');
             $table->date('dateVisite');
+            $table->unsignedBigInteger('patient_id');
+            $table->char('doctor_id',11)->default('11111111111');
+
+            $table->foreign('doctor_id')->references('numRPPS')->on('medecins');
+            $table->foreign('patient_id')->references('id')->on('patients');
         });
     }
 

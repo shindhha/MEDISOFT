@@ -17,11 +17,11 @@ return new class extends Migration
 
             $table->integer('codeCIP7');
             $table->text('instruction');
-            $table->primary(['idVisite','codeCIP7']);
+            $table->primary(['visite_id','codeCIP7']);
 
 
-            $table->unsignedBigInteger('idVisite');
-            $table->foreign('idVisite')->references('idVisite')->on('visites');
+            $table->unsignedBigInteger('visite_id');
+            $table->foreign('visite_id')->references('id')->on('visites');
         });
     }
 

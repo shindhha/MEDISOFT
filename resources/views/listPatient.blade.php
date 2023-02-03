@@ -40,7 +40,7 @@
 											<select name="medecin" class="form-select text-green">
 												<option value="%">MEDECIN</option>
 												@foreach($medecins as $medecin)
-												<option  value="{{$medecin->idMedecin}}" @selected(old('alter') == $medecin)>{{$medecin->nom . ' ' . $medecin->prenom}}</option>
+												<option  value="{{$medecin->id}}" @selected(old('alter') == $medecin)>{{$medecin->nom . ' ' . $medecin->prenom}}</option>
 												@endforeach
 											</select>
 											<select name="pValeurASMR" class="form-select text-green">
@@ -92,7 +92,6 @@
 									<td> 0{{$patient->numTel}} </td>
 									<td>  {{$patient->adresse}} </td>
 
-
 									<td>
 										<div class="dropdown  ">
 											<span class=" material-symbols-outlined" type="button" id="dropdownMenuButton1" data-bs-auto-close="false" data-bs-toggle="dropdown" aria-expanded="false">
@@ -102,7 +101,7 @@
 												<div class="d-flex flex-column green">
 													<table class="text-white ">
 
-														<form action="{{route('showPatient',['id' => $patient->id])}}" action="POST" class="d-flex flex-column green">
+														<form action="{{route('patient.show',$patient)}}" action="POST" class="d-flex flex-column green">
 															@csrf
 															<tr><input type="submit" class="btn text-white text-decoration-underline text-end" value="Afficher"> </tr>
 														</form>
@@ -121,7 +120,7 @@
 					</div>
 					<div class="d-flex flex-row justify-content-end">
 						<div class="d-flex me-2 py-2 px-3 border-1 green">
-							<form method="post" action="{{route('editPatient')}}">
+							<form method="get" action="{{route('patient.create')}}">
 								@csrf
 								<input type="submit" class="green no-border text-white" value="Ajouter un patient">
 							</form>
@@ -130,9 +129,9 @@
 				</div>
 			</div>
 
-
+            @if(!$patients->isEmpty())
 			@include('includes/popup')
-
+            @endif
 
 
 		</div>

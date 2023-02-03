@@ -22,7 +22,7 @@ class PostConnection extends Controller
             if ($request->login == "admin") {
                 return to_route('showCabinet');
             } else {
-                return to_route('showPatients');
+                return to_route('patient.index');
             }
         }
 

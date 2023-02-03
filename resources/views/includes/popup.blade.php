@@ -12,18 +12,17 @@
 			</div>
 			<div class = "d-flex justify-content-end p-3 gap-3">
 				<input type="submit" class="green no-border text-white me-2 py-2 px-3 border-1" data-bs-dismiss="modal" value="Annuler">
-				<form method="post" action="{{route($pageInfos['popUpSettings']['route'])}}">
+				<form method="post" action="{{route($pageInfos['popUpSettings']['route'],${$pageInfos['popUpSettings']['variable']})}}">
 					@csrf
-					@foreach($pageInfos['popUpSettings']['variables'] as $variable)
-					<input type="hidden" name="{{$variable['name']}}" value="" id ="code">
-					@endforeach
+                    @method('DELETE')
+
 					<input type="submit" class="green no-border text-white me-2 py-2 px-3 border-1" value="confirmer">
-					
+
 				</form>
 
 			</div>
-			
-			
+
+
 		</div>
 	</div>
 </div>

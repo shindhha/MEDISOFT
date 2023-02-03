@@ -36,83 +36,11 @@ class PostMedecin extends Controller
         return view('listPatient',['medecins' => $medecin,'patients' => $patients, 'pageInfos' => $pageSettings->getSettings()]);
     }
 
-    public function deletePatient(Request $request)
-    {
-        $idPatient = $request->idPatient;
-        try {
-            DB::beginTransaction();
-            $visites = $this->usersservices->getVisites($idPatient);
-            $this->usersservices->deletePatientFrom("ListeVisites",$idPatient);
-            $this->usersservices->deletePatientFrom("Patients",$idPatient);
-            foreach ($visites as $visite) {
-                $this->usersservices->deleteVisiteFrom("Ordonnances",$visite->idVisite);
-                $this->usersservices->deleteVisiteFrom("Visites",$visite->idVisite);
-            }
-            DB::commit();
-        } catch (PDOException $e) {
-            DB::rollback();
-        }
-
-        return $this->index();
-
-    }
 
 
 
-    public function showPatient($id)
-    {
 
-        $patient = Patient::find($id);
-        $visites = $patient->visites();
 
-        $pageSettings = settings::getDefaultConfigMedecin('Fiche Patient');
-        $pageSettings->setRoute('deleteVisit');
-        $pageSettings->addVariable('idVisite');
-        $pageSettings->addText('Etes vous sur de vouloir supprimer la visite ?');
-        $pageSettings->addText('Touts ses médicaments seront perdue .');
-        return view('patient',['id' => $id ,'visites' => $visites, 'patient' => $patient,'pageInfos' => $pageSettings->getSettings()]);
-    }
-
-    public function addPatient(Request $request)
-    {
-
-        try {
-            $request->validate([
-                'numSecu' => 'required|min:11|max:11|numeric'
-            ]);
-            $newPatient = new Patient;
-            $newPatient->fill($request);
-            $newPatient->save();
-            return to_route('showPatient',['id' => $newPatient->id]);
-
-        } catch (Exception $e) {
-            return redirect()->back()->withInput();
-        }
-        $pageSettings = settings::getDefaultConfigMedecin('Edition Patient');
-        $medecins = $this->usersservices->getMedecins();
-        return view('editPatient',['patient' => $request,
-                                   'medecins' => $medecins,
-                                   'pageInfos' => $pageSettings->getSettings(),
-                                   'id' => '']);
-    }
-
-    public function updatePatient(Request $request,$id)
-    {
-
-        try {
-            $this->usersservices->updatePatient($id,$request->numSecu,$request->LieuNaissance,$request->nom,$request->prenom,$request->dateNaissance,$request->adresse,$request->codePostal,$request->medecinTraitant,$request->numTel,$request->email,$request->sexe,$request->notes);
-            return to_route('showPatient',['id' => $id]);
-        } catch (PDOException $e) {
-
-        }
-        $pageSettings = settings::getDefaultConfigMedecin('Edition Patient');
-        $medecins = $this->usersservices->getMedecins();
-        return view('editPatient',['patient' => $request,
-                                   'medecins' => $medecins,
-                                   'pageInfos' => $pageSettings->getSettings(),
-                                   'id' => $id]);
-
-    }
 
     public function deleteVisite(Request $request)
     {
@@ -131,19 +59,7 @@ class PostMedecin extends Controller
         return to_route('ListMedicament');
     }
 
-    public function goEditPatient($id = null,Request $request = null)
-    {
-        $patient = new alter();
-        if ($id != null ) {
-            $patient = Patient::find($id);
-        }
-        $medecins = $this->usersservices->getMedecins();
-        $pageSettings = settings::getDefaultConfigMedecin('Fiche Patient');
-        return view('editPatient',['patient' => $patient,
-                                  'medecins' => $medecins ,
-                                  'id' => $id,
-                                  'pageInfos' => $pageSettings->getSettings()]);
-    }
+
 
     public function goFicheVisite($id)
     {
@@ -205,7 +121,7 @@ class PostMedecin extends Controller
             $idVisite = $this->usersservices->insertVisite($request->idPatient,$request->motifVisite,$request->Date,$request->Description,$request->Conclusion);
             return to_route('showVisite',['id' => $idVisite]);
         } catch (PDOException $e) {
-
+            throw new PDOException();
         }
         $pageSettings = settings::getDefaultConfigMedecin('Edition de visite');
         return view('editVisite',['idPatient' => $request->idPatient,

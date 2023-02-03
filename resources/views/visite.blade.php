@@ -9,7 +9,7 @@
 			@include('includes/sideBar')
 			<!-- Main page -->
 			<div class="col-md-11 h-75 text-center h-11">
-				<!-- Bandeau outils -->	
+				<!-- Bandeau outils -->
 				@include('includes/navBar')
                 <!-- Bandeau Patient -->
                 <div class="blue row">
@@ -22,17 +22,17 @@
 
                 <div class="row d-flex flex-column gap-3 mx-auto col-8">
                     <div class="d-flex flex-row justify-content-between text-dark px-5">
-                        <span>Motif : {{$visite->motifVisite}}</span>
-                        <span>Date :  {{$visite->dateVisite}}</span>
+                        <span>Motif : {{$visit->motifVisite}}</span>
+                        <span>Date :  {{$visit->dateVisite}}</span>
                     </div>
                     <div class="d-flex flex-column text-start text-dark d-flex flex-column gap-3">
                         Description
                         <div class="border border-dark px-2 pb-4 ">
-                            {{$visite->Description}}
+                            {{$visit->Description}}
                         </div>
                         Conclusion
                         <div class="border border-dark px-2 pb-4">
-                            {{$visite->Conclusion}}
+                            {{$visit->Conclusion}}
                         </div>
                     </div>
                 </div>
@@ -41,7 +41,6 @@
                     <div class="container h-100">
                         <div class="row justify-content-center h-75">
                             <div class=" col-md-10 col-xl-12 col-sm-7 col-12 success border-2">
-                                <div class="text-danger text-start"><?php if(isset($addMedicError)) echo $addMedicError; ?></div>
                                 <div class=" text-dark text-start h2"> Liste des medicaments prescrit </div>
                                 <div class="table-responsive h-75 overflow-scroll">
                                     <table class="table table-striped lightGreen border border-dark">
@@ -68,14 +67,10 @@
                                                     <div class="p-0 text-end dropdown-menu dropdown-menu-end green text-white no-border" aria-labelledby="dropdownMenuButton1">
                                                         <table class="text-white ">
                                                             <form action="index.php" method="POST"  class="d-flex flex-column green text-end">
-                                                                <input type="hidden" name="controller" value="medicamentslist">
-                                                                <input type="hidden" name="action" value="goFicheMedicament">
                                                                 <input type="hidden" name="codeCIP7" value="<?php echo $row['codeCIP7'] ?>">
                                                                 <tr><input type="submit" class="btn text-white text-decoration-underline text-end" value="Afficher"> </tr>
                                                             </form>
                                                             <form action="index.php" method="POST" class="d-flex flex-column green">
-                                                                <input type="hidden" name="controller" value="patientslist">
-                                                                <input type="hidden" name="action" value="deleteMedicament">
                                                                 <input type="hidden" name="codeCIP7" value="<?php echo $row['codeCIP7'] ?>">
                                                                 <tr><input class="btn text-white text-decoration-underline text-end" type="submit" value="Supprimer"></tr>
                                                             </form>
@@ -106,7 +101,7 @@
                                         </form>
                                     </div>
                                     <div class="d-flex me-2 py-2 px-3 border-1 green">
-                                        <form method="post" action="{{route('updateVisite',['id' => $visite->idVisite])}}">
+                                        <form method="get" action="{{route('visit.edit',$visit)}}">
                                             @csrf
                                             <input type="submit" class="green no-border text-white" value="Modifier la visite">
                                         </form>
@@ -131,12 +126,12 @@
                    <textarea id="instruction" name="instruction"></textarea>
                </div>
                <div class = "d-flex justify-content-end p-3">
-                   
+
                   <input type="submit" value="confirmer">
                   <input type="hidden" name="controller" value = "patientslist">
                   <input type="hidden" name="action" value = "editInstruction">
                   <input type="hidden" name="codeCIP7" value="" id ="code">
-                  
+
               </div>
           </form>
       </div>
