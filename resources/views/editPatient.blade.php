@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 @include('includes/header')
-<body onload="resizeMenu()">
+<body>
 <div class="container-fluid h-100  text-white">
     <div class="row h-100">
         <!-- Menu -->
@@ -53,7 +53,7 @@
                                 <select name="medecinTraitant" class="form-select">
                                     <option value="0">Medecin Traitant</option>
                                     @foreach($medecins as $medecin)
-                                        <option  value="{{$medecin->idMedecin}}" @selected(old('alter') == $medecin)>{{$medecin->nom . ' ' . $medecin->prenom}}</option>
+                                        <option  value="{{$medecin->numRPPS}}" @selected(old('alter') == $medecin)>{{$medecin->nom . ' ' . $medecin->prenom}}</option>
                                     @endforeach
                                 </select>
                                 <span >Sexe</span>
@@ -86,7 +86,7 @@
                 <div class="d-flex justify-content-center">
                     <div class="d-flex col-12 col-md-10 text-start mb-2 flex-column text-green">
                         <h1>Notes</h1>
-                        <textarea  name="notes" rows="12" cols="33"></textarea>
+                        <textarea  name="notes" rows="12" cols="33">{{old('notes',$patient->notes)}}</textarea>
                     </div>
                 </div>
 
@@ -94,7 +94,7 @@
                 <div class="d-flex justify-content-end justify-content-md-center">
                     <div class="d-flex col-md-10 flex-row justify-content-between">
                         <div class="d-flex me-2 py-2 px-3 border-1 bg-danger">
-                            <input type="submit" class="bg-danger no-border text-white" value="Annuler" onclick="goTo('index','patientslist')">
+                            <input type="submit" class="bg-danger no-border text-white" value="Annuler">
                         </div>
                         <div class="d-flex me-2 py-2 px-3 border-1 green">
 

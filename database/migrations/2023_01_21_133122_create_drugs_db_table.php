@@ -13,7 +13,6 @@ return new class extends Migration
      */
     public function up()
     {
-
         Schema::create('designationelems', function (Blueprint $table) {
             $table->id('idDesignation');
             $table->text('designation');

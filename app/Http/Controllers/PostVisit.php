@@ -99,7 +99,6 @@ class PostVisit extends Controller
      */
     public function destroy(Visite $visit)
     {
-        dd($visit);
         $patient = $visit->patient;
         $visit->drugs()->delete();
         $visit->delete();

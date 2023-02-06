@@ -56,7 +56,6 @@ class PostPatient extends Controller
      */
     public function store(Request $request)
     {
-
         try {
             $newPatient = new Patient;
             $newPatient->fill($request->all());
@@ -65,7 +64,7 @@ class PostPatient extends Controller
 
         } catch (\PDOException $e) {
         }
-        return redirect()->back()->withInput()->withErrors("Bonjour");
+        return redirect()->back()->withInput();
     }
 
     /**

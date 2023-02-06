@@ -7,12 +7,12 @@
 
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
 	<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
-	
+
 	<title>MEDILOG</title>
-	
+
 </head>
 
-<body onload="resizeMenu()">
+<body>
 	<?php
 	spl_autoload_extensions(".php");
 	spl_autoload_register();
@@ -22,7 +22,6 @@
 		<div class="row h-100">
 			<!-- Menu -->
 			<div id="menu" class="pt-3 menu z-index-dropdown col-md-1 col-4 d-md-flex d-none flex-column gap-3 blue h-100 align-items-center">
-                <span onclick="manageClass('menu','d-none')"class="material-symbols-outlined d-block d-md-none text-end w-100">arrow_back</span>
                 <div class=" green border-1 ratio ratio-1x1">
 
                 </div>
@@ -54,12 +53,11 @@
             </div>
 			<!-- Main page -->
 			<div class="col-md-11 h-100 text-center">
-				<!-- Bandeau outils -->	
-				
+				<!-- Bandeau outils -->
+
 				<nav class="  row h-11 navbar navbar-expand-lg navbar-light green">
 					<div class="d-flex justify-content-between px-5 container-fluid green">
-                        <span class="material-symbols-outlined  d-block d-md-none col-1" onclick="manageClass('menu','d-none')">menu</span>
-                        
+
 						<span class="h1 d-md-block d-none"> Fiche Medicament </span>
                         <form class="ms-2">
                                 <input type="hidden" name="action" value="deconnexion">

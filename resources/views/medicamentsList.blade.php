@@ -2,26 +2,25 @@
 <html>
 @include('includes/header')
 
-<body onload="resizeMenu()">
+<body>
 	<div class="container-fluid h-100  text-white ">
 		<div class="row h-100">
 			<!-- Menu -->
 			@include('includes/sideBar')
 			<!-- Main page -->
 			<div class="col-md-11 h-100 text-center">
-				<!-- Bandeau outils -->	
+				<!-- Bandeau outils -->
 				<nav class="row h-11 navbar navbar-expand-lg navbar-light green">
 					<div class="col-12 d-flex justify-content-center justify-content-md-between px-1 px-md-5 green align-items-center">
 
-						<span class="material-symbols-outlined  d-block d-md-none col-1" onclick="manageClass('menu','d-none')">menu</span>
 						<span class="h1 d-md-block d-none"> Liste Médicaments </span>
 						<!-- Barre de recherche -->
 						<div class="d-flex flex-row align-items-center">
 						<form class=" d-flex align-items-center justify-content-end" action="index.php" method="POST">
 							<input type="hidden" name="controller" value="medicamentslist">
 							<div class="d-flex me-2 py-2 px-3 bg-white border-1 col-7 col-md-10 justify-content-end">
-								<input name="pDesignation" class="no-border form-control" type="search" placeholder="Designation" value="{{$pDesignation}}" onkeyup="showHint(this.value)" aria-label="Search">
-								<input type="submit" class="no-border bg-white material-symbols-outlined text-black" value="search">  
+								<input name="pDesignation" class="no-border form-control" type="search" placeholder="Designation" value="{{$pDesignation}}">
+								<input type="submit" class="no-border bg-white material-symbols-outlined text-black" value="search">
 
 							</div>
 							<!-- Filtre -->
@@ -37,7 +36,7 @@
 												@foreach($niveauSmr as $nSmr)
 												<option @selected(old('pNiveauSmr') == $nSmr)>{{$nSmr}}</option>
 												@endforeach
-												
+
 											</select>
 											<select name="pValeurASMR" class="form-select text-green">
 												<option value="%">Valeur ASMR</option>
@@ -74,7 +73,7 @@
 												<option value="-1"<?php if ($pEtat == -1) echo "selected='selected'"; ?>>Etat Commercialisation</option>
 												<option value="1" <?php if ($pEtat == 1) echo "selected='selected'"; ?>>Commercialisé</option>
 												<option value="0" <?php if ($pEtat == 0) echo "selected='selected'"; ?>>Non Commercialisé</option>
-											</select>	
+											</select>
             							</div>
             							<div class="col-12 d-flex flex-row">
             								<div class="col-6 text-white">
@@ -92,7 +91,7 @@
             					</div>
 
             				</div>
-            				
+
 						</form>
 						<form class="ms-2">
 							<input type="hidden" name="action" value="deconnexion">
@@ -124,7 +123,7 @@
 									<th></th>
 								</tr>
 							</thead>
-								
+
 								<?php
 
 										$surveillance = "";
@@ -150,7 +149,7 @@
 												 ."<td>" . $commercialiser . "</td>"
 												 ."<td>" . $surveillance . "</td>"
 										?>
-										<td>		
+										<td>
 										<div class="dropdown ">
 											<span class=" material-symbols-outlined" type="button" id="dropdownMenuButton1" data-bs-auto-close="false" data-bs-toggle="dropdown" aria-expanded="false">
 												more_horiz
@@ -165,31 +164,31 @@
 															<tr><input type="submit" class="btn text-white text-decoration-underline text-end" value="Afficher"> </tr>
 														</form>
 														<form action="index.php" method="POST" class="d-flex flex-column green">
-															
+
 															<?php if (isset($_SESSION['idVisite'])) {
 															?>
 																<a class="btn text-white text-decoration-underline text-end" data-bs-toggle="modal" href="#exampleModal" onclick="add('<?php echo $row['libellePresentation']."','". $row['codeCIP7']  ?>')" role="button">Ajouter</a>
 															<?php
-															} ?>						
+															} ?>
 														</form>
 													</table>
 											</div>
 										</div>
 										</td>
-										<?php 
+										<?php
 												echo "</tr>";
-											} 
-										?>	
+											}
+										?>
 						</table>
 					</div>
 					</div>
-					
+
 				</div>
-				
+
 			</div>
 
 		</div>
-		
+
 		<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
 		 	<div class="modal-dialog modal-xl modal-dialog-centered">
 
@@ -203,12 +202,12 @@
 		    			<textarea name="instruction"></textarea>
 		    		</div>
 		    		<div class = "d-flex justify-content-end p-3">
-		    			
+
 		    				<input type="submit" value="confirmer">
 		    				<input type="hidden" name="controller" value = "patientslist">
 		    				<input type="hidden" name="action" value = "addMedicament">
 		    				<input type="hidden" name="codeCIP7" value="" id ="code">
-		    			
+
 		    		</div>
 		    		</form>
 		    	</div>

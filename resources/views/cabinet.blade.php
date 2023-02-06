@@ -1,17 +1,17 @@
 	<!DOCTYPE html>
 <html>
 @include('includes/header')
-<body onload="resizeMenu()">
+<body>
 	<div class="container-fluid h-100  text-white">
 		<div class="row h-100">
 			<!-- Menu -->
 			@include('includes/sideBar')
 			<!-- Main page -->
 			<div class="col-md-11 h-75 text-center">
-				<!-- Bandeau outils -->	
-				
+				<!-- Bandeau outils -->
+
 				@include('includes/navbar')
-				
+
 				<span class="fs-1 d-md-none d-sm-block text-green"> Administrateur </span>
 				<!-- content -->
 				<div class="row h-100 align-items-center text-center">

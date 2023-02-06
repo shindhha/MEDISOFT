@@ -2,7 +2,7 @@
 <html>
 @include('includes/header')
 
-<body onload="resizeMenu()">
+<body>
 	<div class="container-fluid h-100  text-white">
 		<div class="row h-100">
 			<!-- Menu -->

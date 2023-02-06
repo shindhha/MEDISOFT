@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 @include('includes/header')
-<body onload="resizeMenu()">
+<body>
 <div class="container-fluid h-100  text-white">
     <div class="row h-100">
         <!-- Menu -->
@@ -17,8 +17,8 @@
                     <div class="d-flex justify-content-between">
                         <span></span>
                         <div>
-                            <span>{{ $medecin->nom}}</span> 
-                            <span>{{ $medecin->prenom }}</span>
+                            <span>{{ $doctor->nom}}</span>
+                            <span>{{ $doctor->prenom }}</span>
                         </div>
                         <div></div>
                     </div>
@@ -31,23 +31,23 @@
                                 <h1>Informations personnelles</h1>
                                 <span> AdresseFAddm
                                     <div class="border border-1 border-green d-flex">
-                                        <span> {{ $medecin->adresse }}
+                                        <span> {{ $doctor->adresse }}
                                         </span>
                                     </div>
                                 </span>
                                 <span> Code postal / Ville
                                     <div class="border border-1 border-green d-flex">
-                                        <span>{{ $medecin->codePostal}}</span> / <span> {{$medecin->ville }}</span>
+                                        <span>{{ $doctor->codePostal}}</span> / <span> {{$doctor->ville }}</span>
                                     </div>
                                 </span>
                                 <span> Téléphone
                                     <div class="border border-1 border-green d-flex">
-                                        <span> {{ $medecin->numTel}}</span>
+                                        <span> {{ $doctor->numTel}}</span>
                                     </div>
                                 </span>
                                 <span>Email
                                     <div class="border border-1 border-green d-flex">
-                                        <span> {{ $medecin->email}}</span>
+                                        <span> {{ $doctor->email}}</span>
                                     </div>
                                 </span>
                             </div>
@@ -55,35 +55,35 @@
                                 <h1>Informations professionnelles</h1>
                                 <span> Numéro RPPS
                                     <div class="border border-1 border-green d-flex">
-                                        <span> {{$medecin->numRPPS}}</span>
+                                        <span> {{$doctor->numRPPS}}</span>
                                     </div>
                                 </span>
                                 <span> Secteur d'activité
                                     <div class="border border-1 border-green d-flex">
-                                        <span> {{$medecin->activite }}</span>
+                                        <span> {{$doctor->activite }}</span>
                                     </div>
                                 </span>
                                 <span> Date d'enregistrement
                                     <div class="border border-1 border-green text-black">
-                                        <span>{{$medecin->dateInscription }}</span>
+                                        <span>{{$doctor->dateInscription }}</span>
                                     </div>
                                 </span>
                                 <span>
                                     Date du début d'activité
                                     <div class="border border-1 border-green text-black">
-                                        <span>{{ $medecin->dateDebutActivites }}</span>
+                                        <span>{{ $doctor->dateDebutActivites }}</span>
                                     </div>
                                 </span>
-                                
+
                             </div>
                         </div>
                     </div>
                     <div class="col-md-12 text-center text-md-end px-4 pt-3">
-                    <form action="{{route('update',['id' => $id])}}" method="post">
+                    <form action="{{route('doctor.edit',$doctor)}}" method="get">
                         @csrf
                         <input type="submit" class="green no-border text-white" value="Modifier le médecin">
                     </form>
-                        
+
                     </div>
             </div>
         </div>

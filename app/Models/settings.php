@@ -25,7 +25,7 @@ class settings extends Model
         $pageSettings = new settings();
         $pageSettings->setTitle($name);
         $pageSettings->addIconToSideBar('/cabinet','article');
-        $pageSettings->addIconToSideBar('/listMedecin','groups');
+        $pageSettings->addIconToSideBar('/doctors','groups');
         $pageSettings->addIconToSideBar('/erreursimport','settings');
         return $pageSettings;
     }

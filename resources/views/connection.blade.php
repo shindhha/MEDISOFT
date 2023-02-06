@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 @include('includes/header')
-<body onload="resizeMenu()">
+<body>
 	<input name="controller" type="hidden" value="connection">
 	<div class="container-fluid h-100  text-white">
 		<div class="row h-100">

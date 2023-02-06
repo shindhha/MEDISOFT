@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 @include('includes/header')
-<body onload="resizeMenu()">
+<body>
 <div class="container-fluid h-100  text-white">
     <div class="row h-100">
         <!-- Menu -->
@@ -27,40 +27,36 @@
                                         <th>Téléphone</th>
                                         <th></th>
                                     </tr>
-                                    
-                                    @foreach($medecins as $medecin)
+
+                                    @foreach($doctors as $doctor)
                                     <tr>
-                                        <td>{{ $medecin->nom}}</td>
-                                        <td>{{$medecin->prenom}}</td>
-                                        <td>{{$medecin->dateDebutActivites}}</td>
-                                        <td>{{$medecin->numTel}}</td>
+                                        <td>{{ $doctor->nom}}</td>
+                                        <td>{{$doctor->prenom}}</td>
+                                        <td>{{$doctor->dateDebutActivites}}</td>
+                                        <td>{{$doctor->numTel}}</td>
                                         <td>
                                         <div class="dropdown">
                                             <span class="material-symbols-outlined" type="button" id="dropdownMenuButton1" data-bs-auto-close="false" data-bs-toggle="dropdown" aria-expanded="false">
                                                 more_horiz
                                             </span>
                                             <div class="p-0  dropdown-menu dropdown-menu-end green text-white no-border" aria-labelledby="dropdownMenuButton1">
-                                                <table class="text-white ">
-                                                    <form action="{{route('show',['id' => $medecin->idMedecin])}}" method="POST" class="d-flex flex-column green">
-                                                        
+
+                                                    <form action="{{route('doctor.show',$doctor)}}" method="get" class="d-flex flex-column green">
                                                         @csrf
-                                                        <input type="hidden" name="idMedecin" value="{{$medecin->idMedecin}}">
-                                                        <tr><td><input type="submit" value="Afficher"> </td></tr>
+                                                        <input type="submit" value="Afficher">
                                                     </form>
-                                                    <form action="{{route('deleteDoctor')}}" method="POST" class="d-flex flex-column green">
-                                                        
+                                                    <form action="{{route('doctor.destroy',$doctor)}}" method="POST" class="d-flex flex-column green">
                                                         @csrf
-                                                        <input type="hidden" name="idMedecin" value="{{$medecin->idMedecin}}">
-                                                        <input type="hidden" name="idUser" value="{{$medecin->idUser}}">
-                                                        <tr><td><input type="submit" value="Supprimer"> </td></tr>
+                                                        @method('DELETE')
+                                                        <input type="submit" value="Supprimer">
                                                     </form>
-                                                </table>            
+
                                             </div>
                                         </div>
                                         </td>
                                         </tr>
                                     @endforeach
-                                    
+
                                 </table>
                             </div>
                         </div>
@@ -71,9 +67,9 @@
             </div>
             <div class="d-flex flex-row justify-content-between float-end">
                 <div class="d-flex me-2 py-2 px-3 border-1 green">
-                    <form action="{{route('add')}}" method="post">
+                    <form action="{{route('doctor.create')}}" method="get">
                         @csrf
-                        
+
                         <input type="submit" class="green no-border text-white" value="Ajouter un médecin">
                     </form>
                 </div>
@@ -82,7 +78,6 @@
         </div>
 
     </div>
-
     <script type="text/javascript" src="scripts/script.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"></script>
 </div>

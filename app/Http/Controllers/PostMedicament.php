@@ -52,8 +52,8 @@ class PostMedicament extends Controller
 
 
     }
-/*
-    public function goFicheMedicament(Request $request)
+
+    public function show(Request $request)
     {
         $view = new View("Sae3.3CabinetMedical/views/medicament");
 
@@ -69,5 +69,5 @@ class PostMedicament extends Controller
             $view = new View("Sae3.3CabinetMedical/views/connection");
         }
         return $view;
-    }*/
+    }
 }

@@ -2,7 +2,7 @@
 <html>
 @include('includes/header')
 
-<body onload="resizeMenu()">
+<body>
 <div class="container-fluid h-100  text-white">
     <div class="row h-100">
         <!-- Menu -->
@@ -94,7 +94,7 @@
                     <div class="text-dark text-start h2">Liste des visites</div>
                     <div class="table-responsive h-75 mb-2 w-100">
                         <table class="table table-striped lightGreen border-top border-dark">
-                            <thead class="sticky-top bg-white text-dark  ">
+                            <thead class="sticky-top bg-white text-dark">
                             <tr>
                                 <th>Motif</th>
                                 <th>Date</th>
@@ -102,9 +102,7 @@
                                 <th></th>
                             </tr>
                             </thead>
-
                             @foreach($visits as $visite)
-
                                 <tr>
                                     <td>{{$visite->motifVisite}} </td>
                                     <td> {{$visite->dateVisite}} </td>
@@ -112,30 +110,20 @@
 
                                     <td>
                                         <div class="dropdown">
-										<span class="material-symbols-outlined" type="button" id="dropdownMenuButton1"
+										    <span class="material-symbols-outlined" type="button" id="dropdownMenuButton1"
                                               data-bs-auto-close="false" data-bs-toggle="dropdown"
                                               aria-expanded="false">
 											more_horiz
-										</span>
-                                            <div
-                                                class="p-0 text-end dropdown-menu dropdown-menu-end green text-white no-border"
-                                                aria-labelledby="dropdownMenuButton1">
-                                                <table class="text-white ">
-                                                    <form action="{{route('visit.show',$visite)}}"
-                                                          method="POST">
-                                                        <tr><input
-                                                                class="btn text-white text-decoration-underline text-end"
-                                                                type="submit" value="Afficher"></tr>
-                                                    </form>
-                                                    <form action="{{route('visit.destroy',$visite)}}"
-                                                          method="POST">
-                                                        @method('DELETE')
-                                                        <tr><a href="#exampleModal" data-bs-toggle="modal"
-                                                               class="btn text-white text-decoration-underline text-end"
-                                                               onclick="add('Visite : {{$visite->motifVisite}} de {{$patient->nom}}  {{$patient->prenom}}','{{$visite->idVisite}} ')">Supprimer</a>
-                                                        </tr>
-                                                    </form>
-                                                </table>
+										    </span>
+                                            <div class="p-0 text-end dropdown-menu dropdown-menu-end green text-white no-border" aria-labelledby="dropdownMenuButton1">
+                                                <form action="{{route('visit.show',$visite)}}" method="POST">
+                                                    <input class="btn text-white text-decoration-underline text-end" type="submit" value="Afficher">
+                                                </form>
+                                                <form action="{{route('visit.destroy',$visite)}}" method="POST" onclick="add(this,'Visite : {{$visite->motifVisite}} de {{$patient->nom}}  {{$patient->prenom}}')">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <a href="#exampleModal" data-bs-toggle="modal" class="btn text-white text-decoration-underline text-end" >Supprimer</a>
+                                                </form>
                                             </div>
                                         </div>
                                     </td>

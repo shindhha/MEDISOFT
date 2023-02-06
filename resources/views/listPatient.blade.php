@@ -2,7 +2,7 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 @include('includes/header')
 
-<body onload="resizeMenu()">
+<body>
 	<div class="container-fluid h-100  text-white">
 		<div class="row h-100">
 			<!-- Menu -->
@@ -13,7 +13,6 @@
 				<nav class="row h-11 navbar navbar-expand-lg navbar-light green">
 					<div class="col-12 d-flex justify-content-center justify-content-md-between px-1 px-md-5 green align-items-center">
 						<div class="d-flex px-md-5 container-fluid green">
-							<span class="material-symbols-outlined  d-block d-md-none col-1" onclick="manageClass('menu','d-none')">menu</span>
 							<span class="h1 d-md-block d-none"> Liste Patients </span>
 
 						</div>
@@ -21,7 +20,7 @@
 						<form class="d-flex align-items-center justify-content-end" action="index.php" method="POST">
 							<input type="hidden" name="controller" value="patientslist">
 							<div class="d-flex me-2 py-2 px-3 bg-white border-1 col-7 col-md-10 justify-content-end">
-								<input name="search" class="no-border form-control" type="search" placeholder="Nom prenom" value="" onkeyup="showHint(this.value)" aria-label="Search">
+								<input name="search" class="no-border form-control" type="search" placeholder="Nom prenom" value="">
 								<input type="submit" class="no-border bg-white material-symbols-outlined text-black" value="search">
 
 							</div>
@@ -93,25 +92,24 @@
 									<td>  {{$patient->adresse}} </td>
 
 									<td>
-										<div class="dropdown  ">
-											<span class=" material-symbols-outlined" type="button" id="dropdownMenuButton1" data-bs-auto-close="false" data-bs-toggle="dropdown" aria-expanded="false">
-												more_horiz
-											</span>
-											<div class="p-0 border-2 dropdown-menu green dropdown-menu-end text-white no-border" aria-labelledby="dropdownMenuButton1">
-												<div class="d-flex flex-column green">
-													<table class="text-white ">
-
-														<form action="{{route('patient.show',$patient)}}" action="POST" class="d-flex flex-column green">
-															@csrf
-															<tr><input type="submit" class="btn text-white text-decoration-underline text-end" value="Afficher"> </tr>
-														</form>
-
-															<a  href="#exampleModal" class="btn text-white text-decoration-underline text-end" data-bs-toggle="modal" class="btn green" onclick="add('{{$patient->nom}}  {{$patient->prenom}}','{{$patient->id}}')">Supprimer</a>
-													</table>
-												</div>
-											</div>
-										</div>
-
+                                        <div class="dropdown">
+										    <span class="material-symbols-outlined" type="button" id="dropdownMenuButton1"
+                                                  data-bs-auto-close="false" data-bs-toggle="dropdown"
+                                                  aria-expanded="false">
+											more_horiz
+										    </span>
+                                            <div class="p-0 text-end dropdown-menu dropdown-menu-end green text-white no-border" aria-labelledby="  dropdownMenuButton1">
+                                                <form action="{{route('patient.show',$patient)}}" method="get">
+                                                    @csrf
+                                                    <input class="btn text-white text-decoration-underline text-end" type="submit" value="Afficher">
+                                                </form>
+                                                <form action="{{route('patient.destroy',$patient)}}" method="POST" onclick="add(this,'{{$patient->nom}}  {{$patient->prenom}}')">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <a href="#exampleModal" data-bs-toggle="modal" class="btn text-white text-decoration-underline text-end" >Supprimer</a>
+                                                </form>
+                                            </div>
+                                        </div>
 									</td>
 								</tr>
 								@endforeach
@@ -132,8 +130,6 @@
             @if(!$patients->isEmpty())
 			@include('includes/popup')
             @endif
-
-
 		</div>
 
 

@@ -2,7 +2,7 @@
 <html>
 @include('includes/header')
 
-<body onload="resizeMenu()">
+<body>
 <div class="container-fluid h-100  text-white">
     <div class="row h-100">
         <!-- Menu -->
@@ -13,7 +13,6 @@
 
             <nav class="  row h-15 navbar navbar-expand-lg navbar-light green">
                 <div class="d-flex justify-content-center justify-content-md-start px-5 container-fluid green">
-                    <span class="material-symbols-outlined  d-block d-md-none col-1" onclick="manageClass('menu','d-none')">menu</span>
                     <span class="h1 "> Visite n°</span>
                     <form>
                         <input type="hidden" name="action" value="deconnexion">
@@ -65,7 +64,7 @@
                             <div class="row justify-content-center">
                                 <div class="d-flex flex-row justify-content-between">
                                     <div class="d-flex me-2 py-2 px-3 border-1 bg-danger">
-                                        <input type="submit" class="bg-danger no-border text-white" value="Annuler" onclick="goTo('goFicheVisite','patientslist')">
+                                        <input type="submit" class="bg-danger no-border text-white" value="Annuler">
                                     </div>
                                     <div class="d-flex me-2 py-2 px-3 border-1 green">
                                         <input type="submit" class="green no-border text-white" value="Valider">

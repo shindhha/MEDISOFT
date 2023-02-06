@@ -14,7 +14,6 @@ class PostAdministrateur extends Controller
 {
     private $importservice;
     private $adminServices;
-    private $lastDoctor;
     private $files = [["CIS_bdpm.txt","BDPM",12,false,0,"CIS_BDPM"],
                       ["CIS_CIP_bdpm.txt","CIP",13,false,4,"CIS_CIP_BDPM","codeCIP13"],
                       ["CIS_COMPO_bdpm.txt","COMPO",8,true,0,"CIS_COMPO"],
@@ -61,52 +60,9 @@ class PostAdministrateur extends Controller
         return to_route('erreursImport');
     }
 
-    public function deleteMedecin(Request $request)
-    {
 
-        try {
-            DB::beginTransaction();
-            $this->adminServices->deleteMedecin($request->idMedecin);
-            $this->adminServices->deleteUser($request->idUser);
-            DB::commit();
-        } catch (PDOException $e) {
-            throw new Exception("Error Processing Request", 1);
 
-            DB::rollback();
-        }
 
-        return to_route('doctorList');
-    }
-
-    public function goListMedecins() {
-        $medecins = $this->adminServices->getMedecinsList();
-        $pageSettings = new settings();
-        $pageSettings = settings::getDefaultConfigAdministrateur('Liste Medecins');
-        return view('listdoctor',['medecins' => $medecins, "pageInfos" => $pageSettings->getSettings()]);
-    }
-
-    public function goEditDoctor($id = null,Request $request = null)
-    {
-        $medecin;
-        if ($id === null) {
-            $medecin = new alter($request);
-        } else {
-            $medecin = $this->adminServices->getMedecin($id);
-        }
-        $pageSettings = settings::getDefaultConfigAdministrateur('Edition Medecin');
-        return view('editDoctor',['alter' => $medecin ,
-                                  'pageInfos' => $pageSettings->getSettings()]);
-    }
-
-    public function goDoctorSheet($id)
-    {
-
-        $this->lastDoctor = $id;
-        $medecin = Medecin1::find($id);
-        $_SESSION['idUserMedecin'] = $medecin->idUser;
-        $pageSettings = settings::getDefaultConfigAdministrateur('Fiche Medecin');
-        return view('DoctorSheet',['id' => $this->lastDoctor,'alter' => $medecin,'pageInfos' => $pageSettings->getSettings()]);
-    }
 
     public function goErreursImport()
     {
@@ -118,93 +74,8 @@ class PostAdministrateur extends Controller
         return view('importErrors',['erreursImport' => $erreursImport,'pageInfos' => $pageSettings->getSettings()]);
     }
 
-    public function updateMedecin(Request $request,$id) {
-        try {
-            DB::beginTransaction();
-            $this->adminServices->updateMedecin($id,
-                $request->numRPPS ,
-                $request->nom,
-                $request->prenom,
-                $request->adresse,
-                $request->codePostal,
-                $request->ville,
-                $request->numTel,
-                $request->email,
-                $request->activite,
-                $request->dateDebutActivite
-            );
-            $idUser = DB::table('medecins')->where('idMedecin',$id)->first();
-            $this->adminServices->updateUser($idUser->idUser,$request->numRPPS,$request->password);
-            DB::commit();
-            return to_route('show',['id' => $id]);
-        } catch (PDOException $e) {
-            DB::rollback();
-            $Errors = [];
-            if ($e->getCode() == "23000") {
-                $Errors['numRPPS'] = ("Ce numéro RPPS est déjà utilisé ! ");
-            }
-            if ($e->getCode() == "HY000") {
-                $Errors['email'] = ("L'adresse mail n'est pas valide ! ");
-            }
-            if ($e->getCode() == "1") {
-                $Errors['numRPPS'] = ($e->getMessage());
-            }
-            if ($e->getCode() == "2") {
-                $Errors['date'] = ($e->getMessage());
-            }
-            return to_route('update',['id' => $id]);
-        }
 
 
 
-        return to_route('update',['id' => $id]);
 
-    }
-
-
-    public function addMedecin(Request $request) {
-        $idUserMedecin;
-        $idMedecin;
-
-        try {
-            DB::beginTransaction();
-             $idUserMedecin = $this->adminServices->addUser($request->numRPPS,$request->password);
-             $idMedecin = $this->adminServices->addMedecin($idUserMedecin,
-                $request->numRPPS ,
-                $request->nom,
-                $request->prenom,
-                $request->adresse,
-                $request->codePostal,
-                $request->ville,
-                $request->numTel,
-                $request->email,
-                $request->activite,
-                $request->dateDebutActivite
-            );
-            DB::commit();
-
-            return to_route('show',['id' => $idMedecin]);
-        } catch (PDOException $e) {
-            DB::rollback();
-            $Errors = [];
-            if ($e->getCode() == "23000") {
-                $Errors['numRPPS'] = ("Ce numéro RPPS est déjà utilisé ! ");
-            }
-            if ($e->getCode() == "HY000") {
-                $Errors['email'] = ("L'adresse mail n'est pas valide ! ");
-            }
-            if ($e->getCode() == "1") {
-                $Errors['numRPPS'] = ($e->getMessage());
-            }
-            if ($e->getCode() == "2") {
-                $Errors['date'] = ($e->getMessage());
-            }
-
-        }
-
-        $pageSettings = settings::getDefaultConfigAdministrateur('Edition Medecin');
-
-        return view('editDoctor',['alter' => $request,'pageInfos' => $pageSettings->getSettings(),'id' => '']);
-
-    }
 }

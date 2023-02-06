@@ -15,16 +15,8 @@ use Illuminate\Support\Facades\Route;
 
 
 
-Route::prefix('/editDoctor')->group( function () {
-    Route::match(['get','post'],'/{id?}', [\App\Http\Controllers\PostAdministrateur::class,'goEditDoctor'])->name('editDoctor');
-    Route::put('/{id}', [\App\Http\Controllers\PostAdministrateur::class,'updateDoctor'])->name('updateDoctor');
-    Route::put('/', [\App\Http\Controllers\PostAdministrateur::class,'addDoctor'])->name('addDoctor');
-});
-Route::post('/deleteDoctor',[\App\Http\Controllers\PostAdministrateur::class,'deleteDoctor'])->name('deleteDoctor');
-Route::any('/ficheMedecin/{id}',[\App\Http\Controllers\PostAdministrateur::class,'showDoctor'])->name('showDoctor');
-Route::match(['get','post'],'/listMedecin',[\App\Http\Controllers\PostAdministrateur::class,'goListMedecins'])->name('showDoctors');
 
-
+/* --------------------------------------------- Routes for Patient ------------------------------------------------- */
 Route::prefix('/patient')->group( function () {
     Route::get('/{patient}/edit}', [\App\Http\Controllers\PostPatient::class,'edit'])->name('patient.edit');
     Route::put('/{patient}', [\App\Http\Controllers\PostPatient::class,'update'])    ->name('patient.update');
@@ -37,6 +29,7 @@ Route::get('/patients/create',[\App\Http\Controllers\PostPatient::class,'create'
 Route::get('/patients',[\App\Http\Controllers\PostPatient::class,'index'])->name('patient.index');
 
 
+/* --------------------------------------------- Routes for Visite ------------------------------------------------- */
 
 Route::prefix('/visit')->group( function () {
     Route::get('/{visit}/edit', [\App\Http\Controllers\PostVisit::class,'edit'])->name('visit.edit');
@@ -47,6 +40,23 @@ Route::prefix('/visit')->group( function () {
 });
 Route::get('/visits/create/{patient}', [\App\Http\Controllers\PostVisit::class,'create'])->name('visit.create');
 Route::post('/visits/store', [\App\Http\Controllers\PostVisit::class,'store'])->name('visit.store');
+
+/* --------------------------------------------- Routes for Doctor ------------------------------------------------- */
+
+Route::prefix('/doctor')->group( function () {
+    Route::get('/{doctor}/edit}', [\App\Http\Controllers\PostMedecin::class,'edit'])->name('doctor.edit');
+    Route::put('/{doctor}', [\App\Http\Controllers\PostMedecin::class,'update'])    ->name('doctor.update');
+    Route::delete('/{doctor}',[\App\Http\Controllers\PostMedecin::class,'destroy']) ->name('doctor.destroy');
+    Route::get('/{doctor}',[\App\Http\Controllers\PostMedecin::class,'show'])       ->name('doctor.show');
+
+});
+Route::post('/doctors/store', [\App\Http\Controllers\PostMedecin::class,'store'])->name('doctor.store');
+Route::get('/doctors/create',[\App\Http\Controllers\PostMedecin::class,'create'])->name('doctor.create');
+Route::get('/doctors',[\App\Http\Controllers\PostMedecin::class,'index'])->name('doctor.index');
+/* --------------------------------------------- Routes for Patient ------------------------------------------------- */
+
+
+
 
 
 
